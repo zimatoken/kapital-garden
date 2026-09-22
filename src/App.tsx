@@ -5,12 +5,13 @@ import { GardenScreen } from './screens/GardenScreen';
 import { BudgetScreen } from './screens/BudgetScreen';
 import { GoalsScreen } from './screens/GoalsScreen';
 import { AchievementsScreen } from './screens/AchievementsScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { createLocalStorageAdapter } from './core/storage';
 import { createInitialState } from './core/factories';
 import { initStore } from './core/store';
 import type { KGState } from './types/state';
 
-type Tab = 'garden' | 'budget' | 'goals' | 'achievements';
+type Tab = 'garden' | 'budget' | 'goals' | 'achievements' | 'settings';
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -59,6 +60,7 @@ export default function App() {
       {tab === 'budget' && <BudgetScreen />}
       {tab === 'goals' && <GoalsScreen />}
       {tab === 'achievements' && <AchievementsScreen />}
+      {tab === 'settings' && <SettingsScreen />}
 
       {/* Нижний таб-бар */}
       <nav className="tab-bar">
@@ -89,6 +91,13 @@ export default function App() {
         >
           <span className="tab-icon">🏆</span>
           <span className="tab-label">Награды</span>
+        </button>
+        <button
+          className={`tab-item ${tab === 'settings' ? 'tab-item-active' : ''}`}
+          onClick={() => setTab('settings')}
+        >
+          <span className="tab-icon">⚙️</span>
+          <span className="tab-label">Настройки</span>
         </button>
       </nav>
     </div>
