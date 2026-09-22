@@ -1312,3 +1312,132 @@ body {
 .goal-choice-general {
   border-color: rgba(34, 197, 94, 0.3);
 }
+
+/* ────────────────────────────────────────────
+   Patterns Card
+   ──────────────────────────────────────────── */
+
+.patterns-card {
+  margin-top: 1rem;
+}
+
+.patterns-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.patterns-header h2 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--heading);
+}
+
+.patterns-month {
+  font-size: 12px;
+  color: var(--subtext);
+}
+
+/* Строка паттерна */
+
+.pattern-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.pattern-label {
+  color: var(--subtext);
+  flex-shrink: 0;
+}
+
+.pattern-value {
+  color: var(--heading);
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Категории */
+
+.pattern-categories {
+  margin: 12px 0 8px;
+  padding: 10px 12px;
+  background: var(--card-bg-soft);
+  border-radius: 10px;
+}
+
+.pattern-categories-title {
+  font-size: 12px;
+  color: var(--subtext);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.pattern-category {
+  display: grid;
+  grid-template-columns: 22px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.pattern-category + .pattern-category {
+  border-top: 1px solid var(--border);
+}
+
+.pattern-category-icon {
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+}
+
+.pattern-category-name {
+  color: var(--text);
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pattern-category-amount {
+  color: var(--heading);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.pattern-category-percent {
+  font-size: 12px;
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Итого */
+
+.pattern-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  gap: 12px;
+}
+
+.pattern-total .pattern-value {
+  color: var(--success);
+  font-size: 16px;
+}

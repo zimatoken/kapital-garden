@@ -6,6 +6,8 @@ import { todayISODate } from '../core/dates';
 import { sumMoney, formatMoney } from '../core/money';
 import { STRINGS } from '../data/strings';
 import { DEFAULT_CATEGORIES } from '../data/defaultCategories';
+import { computePatterns } from '../core/patterns';
+import { PatternsCard } from '../components/PatternsCard';
 import type { Transaction, TxType } from '../types/transaction';
 import type { Goal } from '../types/goal';
 
@@ -62,6 +64,22 @@ export function BudgetScreen() {
   );
 
   const freeMinor = income.minorUnits - expense.minorUnits - deposited.minorUnits;
+
+  // Паттерны за месяц
+  const patterns = useMemo(
+    () => computePatterns(state.transactions, state.categories, monthKey),
+    [state.transactions, state.categories, monthKey],
+  );
+
+  // Человеко-читаемое название месяца
+  const monthLabel = useMemo(() => {
+    const MONTHS = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+    ];
+    const [year, month] = monthKey.split('-');
+    return `${MONTHS[parseInt(month, 10) - 1]} ${year}`;
+  }, [monthKey]);
 
   return (
     <div className="budget-screen">
@@ -142,6 +160,11 @@ export function BudgetScreen() {
             </div>
           )}
         </section>
+
+        {/* ПАТТЕРНЫ ЗА МЕСЯЦ */}
+        {monthTransactions.length > 0 && (
+          <PatternsCard patterns={patterns} monthLabel={monthLabel} />
+        )}
       </main>
 
       {addType && (
