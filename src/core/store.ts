@@ -3,6 +3,7 @@
 import type { KGState } from '../types/state';
 import type { DepositEvent, DepositSource } from '../types/deposit';
 import type { Transaction, TxType } from '../types/transaction';
+import type { Goal, GoalKind, GoalIcon } from '../types/goal';
 import { makeMoney } from './money';
 import { todayISODate } from './dates';
 import type { StorageAdapter } from './storage';
@@ -124,18 +125,6 @@ export class Store {
     this.notify();
   }
 
-  /* ─── Настройки ───────────────────────────── */
-
-  /** Обновить настройки. */
-  async updateSettings(patch: Partial<KGState['settings']>): Promise<void> {
-    this.state = {
-      ...this.state,
-      settings: { ...this.state.settings, ...patch },
-    };
-    await this.adapter.save(this.state);
-    this.notify();
-  }
-
   /* ─── Отложить 10% от дохода ──────────────── */
 
   /**
@@ -145,13 +134,14 @@ export class Store {
    * 1. Сохранить доход как Transaction.
    * 2. Вернуть размер предлагаемого отложения (10% от суммы).
    * 3. Пользователь решает — подтвердить или нет.
-   * 4. Если подтвердил — вызывается addDeposit.
+   * 4. Если подтвердил — вызывается addDeposit (с goalId, если выбран).
    */
   async addIncome(params: {
     amountMinor: number;
     categoryId: string;
     note?: string;
     date?: string;
+    goalId?: string | null;
   }): Promise<{
     transaction: Transaction;
     suggestedDepositMinor: number;
@@ -168,6 +158,70 @@ export class Store {
     const suggestedDepositMinor = Math.round((params.amountMinor * percent) / 100);
 
     return { transaction, suggestedDepositMinor };
+  }
+
+  /* ─── Цели ────────────────────────────────── */
+
+  /** Добавить цель. */
+  async addGoal(params: {
+    kind: GoalKind;
+    icon: GoalIcon;
+    title: string;
+    targetMinor: number;
+    targetDate?: string | null;
+  }): Promise<Goal> {
+    const goal: Goal = {
+      id: crypto.randomUUID(),
+      kind: params.kind,
+      icon: params.icon,
+      title: params.title,
+      targetAmount: makeMoney(params.targetMinor, this.state.settings.baseCurrency),
+      targetDate: params.targetDate ?? null,
+      createdAt: todayISODate(),
+      archived: false,
+    };
+
+    this.state = {
+      ...this.state,
+      goals: [...this.state.goals, goal],
+    };
+
+    await this.adapter.save(this.state);
+    this.notify();
+
+    return goal;
+  }
+
+  /** Обновить цель. */
+  async updateGoal(id: string, patch: Partial<Goal>): Promise<void> {
+    this.state = {
+      ...this.state,
+      goals: this.state.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)),
+    };
+    await this.adapter.save(this.state);
+    this.notify();
+  }
+
+  /** Архивировать цель (не удалять — сохраняем историю). */
+  async archiveGoal(id: string): Promise<void> {
+    await this.updateGoal(id, { archived: true });
+  }
+
+  /** Разархивировать цель. */
+  async unarchiveGoal(id: string): Promise<void> {
+    await this.updateGoal(id, { archived: false });
+  }
+
+  /* ─── Настройки ───────────────────────────── */
+
+  /** Обновить настройки. */
+  async updateSettings(patch: Partial<KGState['settings']>): Promise<void> {
+    this.state = {
+      ...this.state,
+      settings: { ...this.state.settings, ...patch },
+    };
+    await this.adapter.save(this.state);
+    this.notify();
   }
 }
 

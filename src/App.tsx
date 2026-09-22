@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 import { GardenScreen } from './screens/GardenScreen';
 import { BudgetScreen } from './screens/BudgetScreen';
+import { GoalsScreen } from './screens/GoalsScreen';
 import { createLocalStorageAdapter } from './core/storage';
 import { createInitialState } from './core/factories';
 import { initStore } from './core/store';
 import type { KGState } from './types/state';
 
-type Tab = 'garden' | 'budget';
+type Tab = 'garden' | 'budget' | 'goals';
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -53,7 +54,9 @@ export default function App() {
 
   return (
     <div className="app-root">
-      {tab === 'garden' ? <GardenScreen /> : <BudgetScreen />}
+      {tab === 'garden' && <GardenScreen />}
+      {tab === 'budget' && <BudgetScreen />}
+      {tab === 'goals' && <GoalsScreen />}
 
       {/* Нижний таб-бар */}
       <nav className="tab-bar">
@@ -70,6 +73,13 @@ export default function App() {
         >
           <span className="tab-icon">💰</span>
           <span className="tab-label">Бюджет</span>
+        </button>
+        <button
+          className={`tab-item ${tab === 'goals' ? 'tab-item-active' : ''}`}
+          onClick={() => setTab('goals')}
+        >
+          <span className="tab-icon">🎯</span>
+          <span className="tab-label">Цели</span>
         </button>
       </nav>
     </div>

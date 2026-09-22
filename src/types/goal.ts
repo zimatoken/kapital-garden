@@ -1,12 +1,13 @@
-import { ISODate, Money } from './common';
+export type GoalKind = 'apartment' | 'car' | 'pension' | 'education' | 'custom';
+export type GoalIcon = '🏡' | '🚗' | '🌴' | '🎓' | '💎';
 
 export interface Goal {
   id: string;
+  kind: GoalKind;
+  icon: GoalIcon;
   title: string;
-  targetAmount: Money;
-  /** Опционально: дата-дедлайн → показываем «нужный темп X ₽/мес». */
+  targetAmount: Money;      // цель в minorUnits
   targetDate: ISODate | null;
   createdAt: ISODate;
   archived: boolean;
-  /** Прогресс НЕ храним — вычисляется суммой DepositEvent с goalId. */
 }

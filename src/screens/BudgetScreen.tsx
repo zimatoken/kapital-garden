@@ -7,19 +7,20 @@ import { sumMoney, formatMoney } from '../core/money';
 import { STRINGS } from '../data/strings';
 import { DEFAULT_CATEGORIES } from '../data/defaultCategories';
 import type { Transaction, TxType } from '../types/transaction';
+import type { Goal } from '../types/goal';
 
 /**
  * Экран «Бюджет».
  *
- * Показывает:
- * - Доход за месяц
- * - Расход за месяц
- * - Отложено
- * - Свободно для инвестиций
+ * Что показывает:
+ * - Доход / Расход / Отложено (10%) / Свободно
+ * - Кнопка «💎 Инвестировать»
  * - Список транзакций
  *
- * Позволяет добавить доход или расход.
- * При вводе дохода предлагает отложить 10%.
+ * При вводе дохода — предлагает отложить 10%.
+ * Auto-10% можно посадить:
+ *   • в общий сад
+ *   • в конкретную цель
  */
 export function BudgetScreen() {
   const state = useStoreState();
@@ -27,7 +28,7 @@ export function BudgetScreen() {
   const [addType, setAddType] = useState<TxType | null>(null);
 
   const today = todayISODate();
-  const monthKey = today.slice(0, 7); // 'YYYY-MM'
+  const monthKey = today.slice(0, 7);
 
   const monthTransactions = useMemo(
     () => state.transactions.filter((t) => t.date.startsWith(monthKey)),
@@ -132,7 +133,11 @@ export function BudgetScreen() {
                 .slice()
                 .reverse()
                 .map((t) => (
-                  <TransactionRow key={t.id} tx={t} onDelete={() => store.removeTransaction(t.id)} />
+                  <TransactionRow
+                    key={t.id}
+                    tx={t}
+                    onDelete={() => store.removeTransaction(t.id)}
+                  />
                 ))}
             </div>
           )}
@@ -142,6 +147,7 @@ export function BudgetScreen() {
       {addType && (
         <AddTransactionModal
           type={addType}
+          activeGoals={state.goals.filter((g) => !g.archived)}
           onClose={() => setAddType(null)}
         />
       )}
@@ -149,7 +155,7 @@ export function BudgetScreen() {
   );
 }
 
-/* ─── Вспомогательные компоненты ─── */
+/* ─── Транзакция в списке ─── */
 
 function TransactionRow({ tx, onDelete }: { tx: Transaction; onDelete: () => void }) {
   const isIncome = tx.type === 'income';
@@ -174,14 +180,21 @@ function TransactionRow({ tx, onDelete }: { tx: Transaction; onDelete: () => voi
   );
 }
 
+/* ─── Модалка ввода ─── */
+
+type ModalStep = 'amount' | 'choose-goal';
+
 function AddTransactionModal({
   type,
+  activeGoals,
   onClose,
 }: {
   type: TxType;
+  activeGoals: Goal[];
   onClose: () => void;
 }) {
   const store = useStore();
+  const [step, setStep] = useState<ModalStep>('amount');
   const [amountStr, setAmountStr] = useState('1000');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
@@ -195,6 +208,7 @@ function AddTransactionModal({
 
   const categoryId = isIncome ? 'cat-income-salary' : 'cat-food';
 
+  // ─── Шаг 1: Сохранение дохода/расхода ───
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
@@ -205,11 +219,13 @@ function AddTransactionModal({
           categoryId,
           note: note.trim(),
         });
-        // Показываем предложение отложить
+
         if (result.suggestedDepositMinor > 0) {
+          // Есть что отложить — переходим к шагу выбора
           setSuggestDeposit(result.suggestedDepositMinor);
+          setStep('choose-goal');
           setSaving(false);
-          return; // не закрываем — показываем шаг с отложением
+          return;
         }
       } else {
         await store.addTransaction({
@@ -225,13 +241,15 @@ function AddTransactionModal({
     }
   };
 
-  const handleConfirmDeposit = async () => {
+  // ─── Шаг 2: Выбор места для 10% ───
+  const handleChooseGoal = async (goalId: string | null) => {
     if (suggestDeposit === null) return;
     setSaving(true);
     try {
       await store.addDeposit({
         amountMinor: suggestDeposit,
         source: 'auto10',
+        goalId,
         note: note.trim() ? `10% от ${note.trim()}` : '10% от дохода',
       });
       onClose();
@@ -244,28 +262,53 @@ function AddTransactionModal({
     onClose();
   };
 
-  // Шаг 2: предложение отложить
-  if (suggestDeposit !== null) {
+  // ─── Экран 2: выбор цели ───
+  if (step === 'choose-goal' && suggestDeposit !== null) {
     return (
       <div className="modal-backdrop" onClick={onClose}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <header className="modal-header">
-            <h2>🌱 Отложить 10%?</h2>
-            <button className="modal-close" onClick={onClose}>
-              ✕
-            </button>
+            <h2>🌱 Куда посадить {formatMoney({ minorUnits: suggestDeposit, currency: 'RUB' })}?</h2>
+            <button className="modal-close" onClick={onClose}>✕</button>
           </header>
 
           <div className="modal-body">
             <p className="muted" style={{ marginBottom: '1rem' }}>
               Доход {formatMoney({ minorUnits: amountMinor, currency: 'RUB' })} сохранён.
-              Отложить {formatMoney({ minorUnits: suggestDeposit, currency: 'RUB' })} в сад?
+              Отложи 10% — выбери, куда посадить.
             </p>
-            <div className="auto-deposit-hint">
-              💡 Это твой путь к {formatMoney({
-                minorUnits: Math.round(suggestDeposit * 30),
-                currency: 'RUB',
-              })}/мес.
+
+            <div className="goal-choices">
+              {/* Общий сад */}
+              <button
+                className="goal-choice goal-choice-general"
+                onClick={() => handleChooseGoal(null)}
+                disabled={saving}
+              >
+                <span className="goal-choice-icon">🌳</span>
+                <div className="goal-choice-info">
+                  <div className="goal-choice-title">Общий сад</div>
+                  <div className="goal-choice-sub">Без привязки к цели</div>
+                </div>
+              </button>
+
+              {/* Цели */}
+              {activeGoals.map((goal) => (
+                <button
+                  key={goal.id}
+                  className="goal-choice"
+                  onClick={() => handleChooseGoal(goal.id)}
+                  disabled={saving}
+                >
+                  <span className="goal-choice-icon">{goal.icon}</span>
+                  <div className="goal-choice-info">
+                    <div className="goal-choice-title">{goal.title}</div>
+                    <div className="goal-choice-sub">
+                      Цель: {formatMoney(goal.targetAmount)}
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -273,24 +316,19 @@ function AddTransactionModal({
             <button className="btn-secondary" onClick={handleSkipDeposit} disabled={saving}>
               Позже
             </button>
-            <button className="btn-primary" onClick={handleConfirmDeposit} disabled={saving}>
-              {saving ? 'Сажаю...' : '🌱 Посадить'}
-            </button>
           </footer>
         </div>
       </div>
     );
   }
 
-  // Шаг 1: ввод суммы
+  // ─── Экран 1: ввод суммы ───
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <header className="modal-header">
           <h2>{title}</h2>
-          <button className="modal-close" onClick={onClose}>
-            ✕
-          </button>
+          <button className="modal-close" onClick={onClose}>✕</button>
         </header>
 
         <div className="modal-body">
@@ -339,6 +377,8 @@ function AddTransactionModal({
     </div>
   );
 }
+
+/* ─── Формат месяца ─── */
 
 function formatMonth(key: string): string {
   const MONTH_NAMES = [

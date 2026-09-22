@@ -942,3 +942,373 @@ body {
 .modal-footer-split .btn-primary {
   flex: 2;
 }
+
+/* ────────────────────────────────────────────
+   Goals Screen
+   ──────────────────────────────────────────── */
+
+.goals-screen {
+  min-height: 100vh;
+  padding: 1rem;
+  padding-bottom: 80px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.goals-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.goals-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.goals-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.goals-section-header h2 {
+  font-size: 16px;
+  color: var(--heading);
+  margin: 0;
+}
+
+.goals-section h2 {
+  font-size: 16px;
+  color: var(--heading);
+  margin: 0 0 4px 0;
+}
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.goals-archive-toggle {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--subtext);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.goals-archive-toggle:hover {
+  background: var(--card-bg-soft);
+  color: var(--text);
+}
+
+.btn-small {
+  padding: 0.4rem 0.9rem;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: transform 0.15s;
+}
+
+.btn-small:hover {
+  transform: scale(1.02);
+}
+
+/* ────────────────────────────────────────────
+   Goal Card
+   ──────────────────────────────────────────── */
+
+.goal-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.goal-card[role="button"] {
+  cursor: pointer;
+}
+
+.goal-card[role="button"]:hover {
+  border-color: var(--success);
+  transform: translateY(-1px);
+}
+
+.goal-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.goal-card-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.goal-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--heading);
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.goal-card-archive-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--subtext);
+  padding: 2px 6px;
+  background: var(--card-bg-soft);
+  border-radius: 4px;
+}
+
+/* Дорожка стадий */
+
+.goal-card-stages {
+  margin-bottom: 10px;
+}
+
+.stage-track {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 18px;
+}
+
+.stage-item {
+  transition: opacity 0.3s, filter 0.3s;
+}
+
+.stage-item-done {
+  opacity: 1;
+  filter: none;
+}
+
+.stage-item-future {
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+.stage-track-achieved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-track-achieved .stage-item-done {
+  font-size: 24px;
+}
+
+.stage-label {
+  font-size: 13px;
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* Суммы */
+
+.goal-card-amounts {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-card-saved {
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.goal-card-divider {
+  color: var(--subtext);
+}
+
+.goal-card-target {
+  color: var(--subtext);
+}
+
+/* Бар */
+
+.goal-card-bar-wrap {
+  height: 8px;
+  background: var(--card-bg-soft);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.goal-card-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.goal-card-percent {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--success);
+  text-align: right;
+  margin-bottom: 8px;
+}
+
+/* Осталось / ETA */
+
+.goal-card-remaining {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+}
+
+.goal-card-remaining strong {
+  color: var(--heading);
+}
+
+.goal-card-eta {
+  font-size: 12px;
+  color: var(--subtext);
+  line-height: 1.5;
+}
+
+.goal-card-eta strong {
+  color: var(--heading);
+}
+
+.goal-card-eta-hint {
+  font-style: italic;
+  color: var(--subtext-muted);
+}
+
+/* ────────────────────────────────────────────
+   Goal Editor
+   ──────────────────────────────────────────── */
+
+.goal-kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.goal-kind {
+  padding: 0.55rem 0.9rem;
+  background: var(--card-bg-soft);
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.goal-kind:hover {
+  border-color: var(--success);
+  color: var(--text);
+}
+
+.goal-kind-active {
+  background: var(--success);
+  color: #fff;
+  border-color: var(--success);
+  font-weight: 600;
+}
+
+.goal-kind-active:hover {
+  background: var(--success);
+  color: #fff;
+}
+
+.goal-error {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid var(--danger);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+/* ────────────────────────────────────────────
+   Goal Choices (в BudgetScreen — auto-10%)
+   ──────────────────────────────────────────── */
+
+.goal-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  color: var(--text);
+  font-family: inherit;
+  width: 100%;
+}
+
+.goal-choice:hover:not(:disabled) {
+  border-color: var(--success);
+  background: rgba(34, 197, 94, 0.06);
+  transform: translateY(-1px);
+}
+
+.goal-choice:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.goal-choice:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.goal-choice-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.goal-choice-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.goal-choice-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--heading);
+  margin-bottom: 2px;
+}
+
+.goal-choice-sub {
+  font-size: 12px;
+  color: var(--subtext);
+}
+
+.goal-choice-general {
+  border-color: rgba(34, 197, 94, 0.3);
+}
