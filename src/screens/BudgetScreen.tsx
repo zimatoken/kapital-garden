@@ -9,6 +9,7 @@ import { DEFAULT_CATEGORIES } from '../data/defaultCategories';
 import { computePatterns } from '../core/patterns';
 import { PatternsCard } from '../components/PatternsCard';
 import { guessCategory } from '../core/categoryRules';
+import { openGoldenInvestor } from '../core/investment';
 import type { Transaction, TxType } from '../types/transaction';
 import type { Goal } from '../types/goal';
 
@@ -108,7 +109,12 @@ export function BudgetScreen() {
           </div>
 
           {freeMinor > 0 && (
-            <button className="btn-invest">{STRINGS.budgetInvestButton}</button>
+            <button
+              className="btn-invest"
+              onClick={() => openGoldenInvestor(freeMinor)}
+            >
+              {STRINGS.budgetInvestButton}
+            </button>
           )}
         </section>
 
