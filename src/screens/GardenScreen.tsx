@@ -7,9 +7,11 @@ import { TreeVisual } from '../components/TreeVisual';
 import { StreakRing } from '../components/StreakRing';
 import { GardenYear } from '../components/GardenYear';
 import { GrowthNumbers } from '../components/GrowthNumbers';
+import { PulseCard } from '../components/PulseCard';
 import { computeStreak } from '../core/streak';
-import { computeOctave, octaveFromDay } from '../core/octaves';
+import { computeOctave } from '../core/octaves';
 import { computeGardenYear } from '../core/garden';
+import { computePulse } from '../core/pulse';
 import { todayISODate, diffDays } from '../core/dates';
 import { forecastGrowth } from '../core/forecast';
 import { formatMoney, sumMoney } from '../core/money';
@@ -21,13 +23,20 @@ export function GardenScreen() {
 
   const today = todayISODate();
   const year = Number(today.slice(0, 4));
+  const monthKey = today.slice(0, 7);
 
   const streak = useMemo(() => computeStreak(state.deposits, today), [state.deposits, today]);
   const octave = useMemo(() => computeOctave(state.deposits, today), [state.deposits, today]);
   const garden = useMemo(() => computeGardenYear(state.deposits, year), [state.deposits, year]);
   const total = useMemo(() => sumMoney(state.deposits.map((d) => d.amount)), [state.deposits]);
 
-  // Средний дневной темп (за последние 30 дней)
+  // Пульс — сравнение с собой
+  const pulse = useMemo(
+    () => computePulse(state.transactions, state.deposits, monthKey),
+    [state.transactions, state.deposits, monthKey],
+  );
+
+  // Средний дневной темп
   const dailyAvgMinor = useMemo(() => {
     if (state.deposits.length === 0) return 0;
     const first = state.deposits.map((d) => d.date).sort()[0];
@@ -41,7 +50,6 @@ export function GardenScreen() {
     return Math.max(1, diffDays(first, today) + 1);
   }, [state.deposits, today]);
 
-  // Прогресс к следующей октаве
   const octaveProgress = useMemo(() => {
     if (!octave || octave.level >= 8 || octave.rangeEnd === null) return 0;
     const span = octave.rangeEnd - octave.rangeStart + 1;
@@ -66,6 +74,9 @@ export function GardenScreen() {
         <section className="card card-tree">
           <TreeVisual octave={octave} progress={octaveProgress} />
         </section>
+
+        {/* Пульс — сравнение с собой */}
+        {!isEmpty && <PulseCard pulse={pulse} />}
 
         {/* Стрик */}
         {!isEmpty && (

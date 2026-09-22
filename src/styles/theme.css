@@ -1652,3 +1652,84 @@ body {
 .settings-actions .settings-upload {
   user-select: none;
 }
+
+/* ────────────────────────────────────────────
+   Pulse Card — сравнение с собой
+   ──────────────────────────────────────────── */
+
+.pulse-card {
+  margin-top: 12px;
+}
+
+.pulse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.pulse-header h2 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--heading);
+}
+
+.pulse-month {
+  font-size: 12px;
+  color: var(--subtext);
+}
+
+.pulse-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  font-size: 14px;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pulse-row:last-child {
+  border-bottom: none;
+}
+
+.pulse-row-muted {
+  opacity: 0.7;
+}
+
+.pulse-label {
+  color: var(--subtext);
+  flex-shrink: 0;
+}
+
+.pulse-value {
+  color: var(--heading);
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.pulse-prev {
+  color: var(--subtext);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.pulse-delta {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* НЕЙТРАЛЬНЫЙ. Без оценок. Не зелёный, не красный — просто факт. */
+.pulse-delta-neutral {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--subtext);
+}
