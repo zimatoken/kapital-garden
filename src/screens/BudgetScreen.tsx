@@ -1,6 +1,6 @@
 // src/screens/BudgetScreen.tsx
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useStore, useStoreState } from '../hooks/useStore';
 import { todayISODate } from '../core/dates';
 import { sumMoney, formatMoney } from '../core/money';
@@ -8,22 +8,10 @@ import { STRINGS } from '../data/strings';
 import { DEFAULT_CATEGORIES } from '../data/defaultCategories';
 import { computePatterns } from '../core/patterns';
 import { PatternsCard } from '../components/PatternsCard';
+import { guessCategory } from '../core/categoryRules';
 import type { Transaction, TxType } from '../types/transaction';
 import type { Goal } from '../types/goal';
 
-/**
- * Экран «Бюджет».
- *
- * Что показывает:
- * - Доход / Расход / Отложено (10%) / Свободно
- * - Кнопка «💎 Инвестировать»
- * - Список транзакций
- *
- * При вводе дохода — предлагает отложить 10%.
- * Auto-10% можно посадить:
- *   • в общий сад
- *   • в конкретную цель
- */
 export function BudgetScreen() {
   const state = useStoreState();
   const store = useStore();
@@ -65,13 +53,11 @@ export function BudgetScreen() {
 
   const freeMinor = income.minorUnits - expense.minorUnits - deposited.minorUnits;
 
-  // Паттерны за месяц
   const patterns = useMemo(
     () => computePatterns(state.transactions, state.categories, monthKey),
     [state.transactions, state.categories, monthKey],
   );
 
-  // Человеко-читаемое название месяца
   const monthLabel = useMemo(() => {
     const MONTHS = [
       'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
@@ -161,7 +147,6 @@ export function BudgetScreen() {
           )}
         </section>
 
-        {/* ПАТТЕРНЫ ЗА МЕСЯЦ */}
         {monthTransactions.length > 0 && (
           <PatternsCard patterns={patterns} monthLabel={monthLabel} />
         )}
@@ -171,6 +156,7 @@ export function BudgetScreen() {
         <AddTransactionModal
           type={addType}
           activeGoals={state.goals.filter((g) => !g.archived)}
+          categories={state.categories}
           onClose={() => setAddType(null)}
         />
       )}
@@ -210,10 +196,12 @@ type ModalStep = 'amount' | 'choose-goal';
 function AddTransactionModal({
   type,
   activeGoals,
+  categories,
   onClose,
 }: {
   type: TxType;
   activeGoals: Goal[];
+  categories: import('../types/transaction').Category[];
   onClose: () => void;
 }) {
   const store = useStore();
@@ -222,6 +210,7 @@ function AddTransactionModal({
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [suggestDeposit, setSuggestDeposit] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<string>('');
 
   const isIncome = type === 'income';
   const title = isIncome ? STRINGS.budgetAddIncome : STRINGS.budgetAddExpense;
@@ -229,9 +218,20 @@ function AddTransactionModal({
   const amountMinor = Math.round(parseFloat(amountStr.replace(',', '.')) * 100) || 0;
   const canSave = amountMinor > 0 && !saving;
 
-  const categoryId = isIncome ? 'cat-income-salary' : 'cat-food';
+  // Авто-определение категории при вводе заметки
+  useEffect(() => {
+    if (!note.trim()) {
+      setCategoryId(isIncome ? 'cat-income-salary' : 'cat-food');
+      return;
+    }
+    const guessed = guessCategory(note, categories, type);
+    if (guessed) {
+      setCategoryId(guessed);
+    } else {
+      setCategoryId(isIncome ? 'cat-income-other' : 'cat-other');
+    }
+  }, [note, categories, type, isIncome]);
 
-  // ─── Шаг 1: Сохранение дохода/расхода ───
   const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
@@ -244,7 +244,6 @@ function AddTransactionModal({
         });
 
         if (result.suggestedDepositMinor > 0) {
-          // Есть что отложить — переходим к шагу выбора
           setSuggestDeposit(result.suggestedDepositMinor);
           setStep('choose-goal');
           setSaving(false);
@@ -264,7 +263,6 @@ function AddTransactionModal({
     }
   };
 
-  // ─── Шаг 2: Выбор места для 10% ───
   const handleChooseGoal = async (goalId: string | null) => {
     if (suggestDeposit === null) return;
     setSaving(true);
@@ -285,24 +283,21 @@ function AddTransactionModal({
     onClose();
   };
 
-  // ─── Экран 2: выбор цели ───
   if (step === 'choose-goal' && suggestDeposit !== null) {
     return (
       <div className="modal-backdrop" onClick={onClose}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <header className="modal-header">
-            <h2>🌱 Куда посадить {formatMoney({ minorUnits: suggestDeposit, currency: 'RUB' })}?</h2>
+            <h2>🌱 Куда посадить {formatMoney({ minorUnits: suggestDeposit, currency: 'RUB' })}</h2>
             <button className="modal-close" onClick={onClose}>✕</button>
           </header>
 
           <div className="modal-body">
             <p className="muted" style={{ marginBottom: '1rem' }}>
-              Доход {formatMoney({ minorUnits: amountMinor, currency: 'RUB' })} сохранён.
-              Отложи 10% — выбери, куда посадить.
+              10% от дохода ({formatMoney({ minorUnits: amountMinor, currency: 'RUB' })}).
             </p>
 
             <div className="goal-choices">
-              {/* Общий сад */}
               <button
                 className="goal-choice goal-choice-general"
                 onClick={() => handleChooseGoal(null)}
@@ -315,7 +310,6 @@ function AddTransactionModal({
                 </div>
               </button>
 
-              {/* Цели */}
               {activeGoals.map((goal) => (
                 <button
                   key={goal.id}
@@ -345,7 +339,6 @@ function AddTransactionModal({
     );
   }
 
-  // ─── Экран 1: ввод суммы ───
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -384,6 +377,18 @@ function AddTransactionModal({
             maxLength={80}
           />
 
+          {/* Индикатор авто-категории */}
+          {categoryId && (
+            <div className="auto-category-hint">
+              {(() => {
+                const cat = categories.find((c) => c.id === categoryId);
+                return cat ? (
+                  <>Категория: {cat.icon} {cat.name}</>
+                ) : null;
+              })()}
+            </div>
+          )}
+
           {isIncome && (
             <div className="auto-deposit-hint">
               💡 {STRINGS.budgetAutoDepositHint}
@@ -400,8 +405,6 @@ function AddTransactionModal({
     </div>
   );
 }
-
-/* ─── Формат месяца ─── */
 
 function formatMonth(key: string): string {
   const MONTH_NAMES = [

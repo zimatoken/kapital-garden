@@ -1441,3 +1441,18 @@ body {
   color: var(--success);
   font-size: 16px;
 }
+
+/* ────────────────────────────────────────────
+   Auto Category Hint (BudgetScreen)
+   ──────────────────────────────────────────── */
+
+.auto-category-hint {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--success);
+  font-weight: 600;
+}
