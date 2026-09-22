@@ -52,3 +52,6 @@ src/
 
 Экраны: GardenScreen, DepositsScreen, BudgetScreen, GoalsScreen, SettingsScreen.
 Подробности — в docs/SARKOFAG-v1.1.md
+
+# kapital-garden
+🎯 ГЛАВНАЯ ИДЕЯ  «Kapital Garden» — не учёт трат. «Kapital Garden» — не бюджет. «Kapital Garden» — не финансовый советник.  ЭТО: САД ТВОЕГО КАПИТАЛА.  Каждая отложенная копейка — семя. Каждая неделя — росток. Каждый месяц — дерево. Каждый год — лес.  ГЛАВНЫЙ ПРИНЦИП: «Откладывай 10% — и твой сад растёт.» 
