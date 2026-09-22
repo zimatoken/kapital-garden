@@ -1733,3 +1733,296 @@ body {
   background: rgba(148, 163, 184, 0.15);
   color: var(--subtext);
 }
+
+/* ────────────────────────────────────────────
+   Analytics Screen
+   ──────────────────────────────────────────── */
+
+.analytics-screen {
+  padding-bottom: 88px;
+}
+
+.analytics-main {
+  padding: 0 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Переключатель периода */
+.period-switch {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.period-btn {
+  padding: 10px 0;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.period-btn:hover {
+  border-color: var(--success);
+}
+
+.period-btn-active {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* Итого */
+.analytics-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.summary-label {
+  color: var(--subtext);
+}
+
+.summary-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-income { color: #4ade80; }
+.summary-expense { color: #f87171; }
+.summary-deposit { color: #facc15; }
+
+/* ─── График по месяцам ─── */
+.month-chart {
+  width: 100%;
+}
+
+.month-chart-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--subtext);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-income  { background: #4ade80; }
+.legend-expense { background: #f87171; }
+.legend-deposit { background: #facc15; }
+
+.month-chart-bars {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 4px;
+  height: 160px;
+  padding-bottom: 24px;
+  position: relative;
+}
+
+.month-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+
+.month-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+}
+
+.bar {
+  width: 6px;
+  border-radius: 3px 3px 0 0;
+  transition: all 0.2s;
+  min-height: 2px;
+}
+
+.bar-income  { background: #4ade80; }
+.bar-expense { background: #f87171; }
+.bar-deposit { background: #facc15; }
+
+.month-label {
+  position: absolute;
+  bottom: -20px;
+  font-size: 11px;
+  color: var(--subtext);
+  text-transform: lowercase;
+}
+
+/* ─── Круговая диаграмма ─── */
+.category-pie {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.category-pie-chart {
+  display: flex;
+  justify-content: center;
+}
+
+.category-pie-legend {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pie-legend-row {
+  display: grid;
+  grid-template-columns: 12px 20px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.pie-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.pie-legend-icon {
+  font-size: 16px;
+  text-align: center;
+}
+
+.pie-legend-name {
+  color: var(--text);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pie-legend-amount {
+  color: var(--heading);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pie-legend-percent {
+  font-size: 12px;
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ────────────────────────────────────────────
+   Analytics — факты
+   ──────────────────────────────────────────── */
+
+.analytics-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fact-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.fact-emoji {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.fact-text {
+  color: var(--text);
+}
+
+.fact-text strong {
+  color: var(--heading);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ────────────────────────────────────────────
+   MonthChart — сетка и нулевые бары
+   ──────────────────────────────────────────── */
+
+.month-chart-grid {
+  position: relative;
+  height: 180px;
+  padding-bottom: 24px;
+}
+
+.grid-lines {
+  position: absolute;
+  inset: 0 0 24px 0;
+  pointer-events: none;
+}
+
+.grid-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.grid-line-label {
+  position: absolute;
+  right: 0;
+  top: -16px;
+  font-size: 10px;
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  background: var(--card-bg);
+  padding: 0 4px;
+}
+
+.month-label-current {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.bar-empty {
+  opacity: 0.15;
+}
