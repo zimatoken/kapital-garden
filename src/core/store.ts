@@ -4,6 +4,7 @@ import type { KGState } from '../types/state';
 import type { DepositEvent, DepositSource } from '../types/deposit';
 import type { Transaction, TxType } from '../types/transaction';
 import type { Goal, GoalKind, GoalIcon } from '../types/goal';
+import type { RecurringExpense } from '../types/recurring';
 import { makeMoney } from './money';
 import { todayISODate } from './dates';
 import type { StorageAdapter } from './storage';
@@ -47,7 +48,6 @@ export class Store {
 
   /* ─── Отложения (семена) ──────────────────── */
 
-  /** Добавить отложение. */
   async addDeposit(params: {
     amountMinor: number;
     source: DepositSource;
@@ -75,7 +75,6 @@ export class Store {
     return event;
   }
 
-  /** Удалить отложение. */
   async removeDeposit(id: string): Promise<void> {
     this.state = {
       ...this.state,
@@ -87,7 +86,6 @@ export class Store {
 
   /* ─── Транзакции (бюджет) ─────────────────── */
 
-  /** Добавить транзакцию (доход или расход). */
   async addTransaction(params: {
     type: TxType;
     amountMinor: number;
@@ -115,7 +113,6 @@ export class Store {
     return tx;
   }
 
-  /** Удалить транзакцию. */
   async removeTransaction(id: string): Promise<void> {
     this.state = {
       ...this.state,
@@ -127,15 +124,6 @@ export class Store {
 
   /* ─── Отложить 10% от дохода ──────────────── */
 
-  /**
-   * Добавить доход + предложить отложить 10%.
-   *
-   * Логика:
-   * 1. Сохранить доход как Transaction.
-   * 2. Вернуть размер предлагаемого отложения (10% от суммы).
-   * 3. Пользователь решает — подтвердить или нет.
-   * 4. Если подтвердил — вызывается addDeposit (с goalId, если выбран).
-   */
   async addIncome(params: {
     amountMinor: number;
     categoryId: string;
@@ -162,7 +150,6 @@ export class Store {
 
   /* ─── Цели ────────────────────────────────── */
 
-  /** Добавить цель. */
   async addGoal(params: {
     kind: GoalKind;
     icon: GoalIcon;
@@ -192,7 +179,6 @@ export class Store {
     return goal;
   }
 
-  /** Обновить цель. */
   async updateGoal(id: string, patch: Partial<Goal>): Promise<void> {
     this.state = {
       ...this.state,
@@ -202,19 +188,78 @@ export class Store {
     this.notify();
   }
 
-  /** Архивировать цель (не удалять — сохраняем историю). */
   async archiveGoal(id: string): Promise<void> {
     await this.updateGoal(id, { archived: true });
   }
 
-  /** Разархивировать цель. */
   async unarchiveGoal(id: string): Promise<void> {
     await this.updateGoal(id, { archived: false });
   }
 
+  /* ─── Регулярные расходы ─────────────────── */
+
+  /**
+   * Создать регулярный расход.
+   */
+  async addRecurring(params: {
+    title: string;
+    amountMinor: number;
+    categoryId: string;
+    dayOfMonth: number;
+    note?: string;
+  }): Promise<RecurringExpense> {
+    const recurring: RecurringExpense = {
+      id: crypto.randomUUID(),
+      title: params.title,
+      amount: makeMoney(params.amountMinor, this.state.settings.baseCurrency),
+      categoryId: params.categoryId,
+      dayOfMonth: params.dayOfMonth,
+      lastAppliedMonth: null,
+      active: true,
+      note: params.note ?? params.title,
+      createdAt: todayISODate(),
+    };
+
+    this.state = {
+      ...this.state,
+      recurring: [...this.state.recurring, recurring],
+    };
+
+    await this.adapter.save(this.state);
+    this.notify();
+
+    return recurring;
+  }
+
+  /**
+   * Обновить регулярный (например, отметить как применённый
+   * через markApplied из core/recurring.ts).
+   */
+  async updateRecurring(recurring: RecurringExpense): Promise<void> {
+    this.state = {
+      ...this.state,
+      recurring: this.state.recurring.map((r) =>
+        r.id === recurring.id ? recurring : r,
+      ),
+    };
+    await this.adapter.save(this.state);
+    this.notify();
+  }
+
+  /**
+   * Удалить регулярный.
+   */
+  async removeRecurring(id: string): Promise<void> {
+    this.state = {
+      ...this.state,
+      recurring: this.state.recurring.filter((r) => r.id !== id),
+    };
+    await this.adapter.save(this.state);
+    this.notify();
+  }
+
   /* ─── Настройки ───────────────────────────── */
 
-  /** Обновить настройки. */
   async updateSettings(patch: Partial<KGState['settings']>): Promise<void> {
     this.state = {
       ...this.state,

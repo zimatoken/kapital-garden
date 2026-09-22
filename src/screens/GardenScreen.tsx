@@ -3,11 +3,13 @@
 import { useMemo, useState } from 'react';
 import { useStoreState } from '../hooks/useStore';
 import { QuickDeposit } from '../components/QuickDeposit';
+import { QuickExpense } from '../components/QuickExpense';
 import { TreeVisual } from '../components/TreeVisual';
 import { StreakRing } from '../components/StreakRing';
 import { GardenYear } from '../components/GardenYear';
 import { GrowthNumbers } from '../components/GrowthNumbers';
 import { PulseCard } from '../components/PulseCard';
+import { RecurringPrompt } from '../components/RecurringPrompt';
 import { computeStreak } from '../core/streak';
 import { computeOctave } from '../core/octaves';
 import { computeGardenYear } from '../core/garden';
@@ -20,6 +22,7 @@ import { STRINGS } from '../data/strings';
 export function GardenScreen() {
   const state = useStoreState();
   const [depositOpen, setDepositOpen] = useState(false);
+  const [expenseOpen, setExpenseOpen] = useState(false);
 
   const today = todayISODate();
   const year = Number(today.slice(0, 4));
@@ -78,6 +81,9 @@ export function GardenScreen() {
         {/* Пульс — сравнение с собой */}
         {!isEmpty && <PulseCard pulse={pulse} />}
 
+        {/* Промпт регулярных расходов */}
+        {!isEmpty && <RecurringPrompt />}
+
         {/* Стрик */}
         {!isEmpty && (
           <section className="card card-streak">
@@ -130,18 +136,32 @@ export function GardenScreen() {
         )}
       </main>
 
-      {/* Плавающая кнопка */}
-      <button
-        className="fab"
-        onClick={() => setDepositOpen(true)}
-        aria-label="Посадить семя"
-      >
-        🌱
-      </button>
+      {/* Плавающие кнопки */}
+      <div className="fab-group">
+        <button
+          className="fab fab-expense"
+          onClick={() => setExpenseOpen(true)}
+          aria-label="Записать расход"
+        >
+          💸
+        </button>
+        <button
+          className="fab fab-deposit"
+          onClick={() => setDepositOpen(true)}
+          aria-label="Посадить семя"
+        >
+          🌱
+        </button>
+      </div>
 
       <QuickDeposit
         open={depositOpen}
         onClose={() => setDepositOpen(false)}
+      />
+
+      <QuickExpense
+        open={expenseOpen}
+        onClose={() => setExpenseOpen(false)}
       />
     </div>
   );

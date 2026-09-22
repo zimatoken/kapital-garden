@@ -2,12 +2,15 @@
 
 import { useState } from 'react';
 import { useStore, useStoreState } from '../hooks/useStore';
+import { RecurringEditor } from '../components/RecurringEditor';
+import { formatMoney } from '../core/money';
 import type { AppSettings } from '../types/settings';
 
 export function SettingsScreen() {
   const state = useStoreState();
   const store = useStore();
   const [confirmReset, setConfirmReset] = useState(false);
+  const [recurringOpen, setRecurringOpen] = useState(false);
 
   const savings = state.settings.savings;
 
@@ -87,6 +90,47 @@ export function SettingsScreen() {
           </p>
         </section>
 
+        {/* ─── Регулярные расходы ─── */}
+        <section className="card">
+          <h2>🔁 Регулярные расходы</h2>
+          <p className="muted" style={{ marginBottom: 12 }}>
+            Ипотека, ЖКХ, подписки. Приложение напомнит в начале месяца.
+          </p>
+
+          {state.recurring.length === 0 ? (
+            <p className="muted" style={{ fontSize: 13 }}>
+              Пока пусто. Добавь — и больше не забывай.
+            </p>
+          ) : (
+            <div className="recurring-list">
+              {state.recurring.map((r) => (
+                <div key={r.id} className="recurring-row">
+                  <div className="recurring-info">
+                    <div className="recurring-title">{r.title}</div>
+                    <div className="recurring-sub">
+                      {formatMoney(r.amount)} · {r.dayOfMonth}-е число
+                    </div>
+                  </div>
+                  <button
+                    className="tx-delete"
+                    onClick={() => store.removeRecurring(r.id)}
+                    aria-label="Удалить"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            className="recurring-add-btn"
+            onClick={() => setRecurringOpen(true)}
+          >
+            + Добавить регулярный
+          </button>
+        </section>
+
         {/* ─── Данные ─── */}
         <section className="card">
           <h2>📦 Данные</h2>
@@ -137,11 +181,16 @@ export function SettingsScreen() {
           <h2>🌳 О Kapital Garden</h2>
           <p className="muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
             Каждая отложенная копейка — семя твоего будущего.<br />
-            Версия 0.7 · PHASE 6<br />
+            Версия 1.1 · PHASE 7<br />
             Данные только у тебя. Никакой регистрации.
           </p>
         </section>
       </main>
+
+      <RecurringEditor
+        open={recurringOpen}
+        onClose={() => setRecurringOpen(false)}
+      />
     </div>
   );
 }

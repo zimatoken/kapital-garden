@@ -1,7 +1,10 @@
-import { AppSettings } from './settings';
-import { DepositEvent } from './deposit';
-import { Goal } from './goal';
-import { Category, Transaction } from './transaction';
+// src/types/state.ts
+
+import type { AppSettings } from './settings';
+import type { DepositEvent } from './deposit';
+import type { Goal } from './goal';
+import type { RecurringExpense } from './recurring';
+import type { Category, Transaction } from './transaction';
 
 export const CURRENT_SCHEMA_VERSION = 1;
 
@@ -15,4 +18,6 @@ export interface KGState {
   /** ← сад, октавы, стрик — ВСЁ вычисляется из этого массива. */
   deposits: DepositEvent[];
   goals: Goal[];
+  /** ← регулярные расходы (ипотека, ЖКХ, подписки). */
+  recurring: RecurringExpense[];
 }

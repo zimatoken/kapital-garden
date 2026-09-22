@@ -1,4 +1,7 @@
-import { CURRENT_SCHEMA_VERSION, KGState } from '../types/state';
+// src/core/migrations.ts
+
+import type { KGState } from '../types/state';
+import { CURRENT_SCHEMA_VERSION } from '../types/state';
 import { createInitialState } from './factories';
 
 type Migration = (raw: unknown) => unknown;
@@ -10,6 +13,26 @@ type Migration = (raw: unknown) => unknown;
 const MIGRATIONS: Record<number, Migration> = {
   // 1: (raw) => raw, // пример: v1 → v2
 };
+
+/**
+ * Нормализация state.
+ *
+ * Даже если schemaVersion совпадает, но state старый (например,
+ * добавлено поле `recurring` без бампа версии) — подстрахуемся.
+ *
+ * Правило: любое новое обязательное поле массива/объекта —
+ * проверяем и инициализируем пустым значением.
+ */
+function normalize(state: KGState): KGState {
+  return {
+    ...state,
+    recurring: Array.isArray(state.recurring) ? state.recurring : [],
+    transactions: Array.isArray(state.transactions) ? state.transactions : [],
+    deposits: Array.isArray(state.deposits) ? state.deposits : [],
+    goals: Array.isArray(state.goals) ? state.goals : [],
+    categories: Array.isArray(state.categories) ? state.categories : [],
+  };
+}
 
 export function migrateState(raw: unknown): KGState {
   if (typeof raw !== 'object' || raw === null) {
@@ -32,5 +55,6 @@ export function migrateState(raw: unknown): KGState {
     state = step(state);
     version++;
   }
-  return state as KGState;
+
+  return normalize(state as KGState);
 }
