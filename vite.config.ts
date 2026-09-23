@@ -49,6 +49,36 @@ export default defineConfig({
             purpose: 'maskable',
           },
         ],
+        shortcuts: [
+          {
+            name: 'Записать расход',
+            short_name: 'Расход',
+            description: 'Быстрый ввод расхода',
+            url: '/kapital-garden/#budget',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }],
+          },
+          {
+            name: 'Посадить семя',
+            short_name: 'Отложить',
+            description: 'Записать отложение в сад',
+            url: '/kapital-garden/#garden',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }],
+          },
+          {
+            name: 'Аналитика',
+            short_name: 'Анализ',
+            description: 'Куда уходят деньги',
+            url: '/kapital-garden/#analytics',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }],
+          },
+          {
+            name: 'Мои цели',
+            short_name: 'Цели',
+            description: 'Прогресс к целям',
+            url: '/kapital-garden/#goals',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }],
+          },
+        ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
