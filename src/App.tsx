@@ -7,6 +7,8 @@ import { GoalsScreen } from './screens/GoalsScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { AchievementsScreen } from './screens/AchievementsScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+import { Onboarding, shouldShowOnboarding } from './components/Onboarding';
+import { ThemeApplier } from './components/ThemeApplier';
 import { createLocalStorageAdapter } from './core/storage';
 import { createInitialState } from './core/factories';
 import { initStore } from './core/store';
@@ -32,6 +34,7 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [state, setState] = useState<KGState | null>(null);
   const [tab, setTab] = useState<Tab>(() => tabFromHash());
+  const [showOnboarding, setShowOnboarding] = useState(() => shouldShowOnboarding());
 
   // Синхронизация hash → state
   useEffect(() => {
@@ -74,6 +77,7 @@ export default function App() {
     setTab(t);
   };
 
+  // ─── Загрузка ───
   if (!ready || !state) {
     return (
       <div className="loading-screen">
@@ -83,8 +87,25 @@ export default function App() {
     );
   }
 
+  // ─── Онбординг (первый запуск) ───
+  if (showOnboarding) {
+    return (
+      <Onboarding
+        onFinish={() => {
+          setShowOnboarding(false);
+          // Открываем Сад — там FAB для первого семени
+          go('garden');
+        }}
+      />
+    );
+  }
+
+  // ─── Основной интерфейс ───
   return (
     <div className="app-root">
+      {/* Применяет тему из settings.theme → data-theme на <html> */}
+      <ThemeApplier />
+
       {tab === 'garden' && <GardenScreen />}
       {tab === 'budget' && <BudgetScreen />}
       {tab === 'goals' && <GoalsScreen />}

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useStore, useStoreState } from '../hooks/useStore';
 import { RecurringEditor } from '../components/RecurringEditor';
 import { formatMoney } from '../core/money';
+import { exportFullCSV } from '../core/csv';
 import type { AppSettings } from '../types/settings';
 
 export function SettingsScreen() {
@@ -90,6 +91,29 @@ export function SettingsScreen() {
           </p>
         </section>
 
+        {/* ─── Тема ─── */}
+        <section className="card">
+          <h2>🎨 Тема оформления</h2>
+          <p className="muted" style={{ marginBottom: 12 }}>
+            Как выглядит приложение
+          </p>
+          <div className="theme-switch">
+            {(['light', 'dark', 'system'] as const).map((t) => (
+              <button
+                key={t}
+                className={`theme-btn ${state.settings.theme === t ? 'theme-btn-active' : ''}`}
+                onClick={() =>
+                  store.updateSettings({ ...state.settings, theme: t })
+                }
+              >
+                {t === 'light' && '☀️ Светлая'}
+                {t === 'dark' && '🌙 Тёмная'}
+                {t === 'system' && '⚙️ Системная'}
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* ─── Регулярные расходы ─── */}
         <section className="card">
           <h2>🔁 Регулярные расходы</h2>
@@ -150,6 +174,9 @@ export function SettingsScreen() {
                 style={{ display: 'none' }}
               />
             </label>
+            <button className="btn-secondary" onClick={() => exportFullCSV(state)}>
+              📊 Экспорт CSV (для Excel)
+            </button>
           </div>
         </section>
 
