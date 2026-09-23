@@ -1,8 +1,28 @@
 {
   "name": "kapital-garden",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.6.0",
   "type": "module",
+  "description": "Сад твоего капитала. Каждая отложенная копейка — семя твоего будущего.",
+  "author": "zimatoken",
+  "license": "MIT",
+  "homepage": "https://zimatoken.github.io/kapital-garden/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zimatoken/kapital-garden.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zimatoken/kapital-garden/issues"
+  },
+  "keywords": [
+    "savings",
+    "budget",
+    "pwa",
+    "personal-finance",
+    "react",
+    "typescript",
+    "kapital-garden"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
