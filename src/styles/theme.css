@@ -2696,3 +2696,84 @@ body {
   background: rgba(22, 163, 74, 0.12) !important;
   color: #15803d !important;
 }
+
+/* ────────────────────────────────────────────
+   Goal Scenarios
+   ──────────────────────────────────────────── */
+
+.goal-scenarios {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.goal-scenarios-title {
+  font-size: 12px;
+  color: var(--subtext);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.goal-scenario-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: 13px;
+  gap: 12px;
+}
+
+.goal-scenario-base {
+  color: var(--heading);
+  font-weight: 700;
+}
+
+.goal-scenario-label {
+  color: var(--subtext);
+}
+
+.goal-scenario-base .goal-scenario-label {
+  color: var(--heading);
+}
+
+.goal-scenario-value {
+  color: var(--heading);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.goal-scenario-delta {
+  font-size: 12px;
+  color: var(--success);
+  font-weight: 700;
+}
+
+.goal-scenario-plan {
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.goal-scenario-plan strong {
+  color: var(--heading);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Светлая тема — чуть темнее план */
+[data-theme='light'] .goal-scenario-plan {
+  background: rgba(202, 138, 4, 0.08);
+  border-color: rgba(202, 138, 4, 0.3);
+  color: #78350f;
+}
+
+[data-theme='light'] .goal-scenario-plan strong {
+  color: #78350f;
+}

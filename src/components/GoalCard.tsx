@@ -3,6 +3,8 @@
 import type { GoalProgress } from '../core/goals';
 import { STAGE_EMOJI, STAGE_LABEL, formatEta } from '../core/goals';
 import { formatMoney } from '../core/money';
+import { todayISODate } from '../core/dates';
+import { GoalScenario } from './GoalScenario';
 
 interface GoalCardProps {
   progress: GoalProgress;
@@ -18,11 +20,12 @@ interface GoalCardProps {
  * - Прогресс (дерево + бар + %)
  * - Остаток
  * - ETA (если данных достаточно)
+ * - Сценарии «что если ускорить»
  */
 export function GoalCard({ progress, onClick }: GoalCardProps) {
   const { goal, saved, target, percent, remaining, etaDays, stage, hasEnoughData } = progress;
-
   const etaText = formatEta(etaDays);
+  const today = todayISODate();
 
   return (
     <div
@@ -54,7 +57,7 @@ export function GoalCard({ progress, onClick }: GoalCardProps) {
       <div className="goal-card-bar-wrap">
         <div
           className="goal-card-bar"
-          style={{ width: `${Math.min(100, percent)}%` }}
+          style={{ width: `${Math.max(2, Math.min(100, percent))}%` }}
         />
       </div>
 
@@ -81,6 +84,11 @@ export function GoalCard({ progress, onClick }: GoalCardProps) {
           </span>
         )}
       </div>
+
+      {/* Сценарии — только для активных целей с данными */}
+      {!goal.archived && stage !== 'achieved' && (
+        <GoalScenario progress={progress} today={today} />
+      )}
     </div>
   );
 }
