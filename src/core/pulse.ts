@@ -37,8 +37,10 @@ export interface Pulse {
 /**
  * Получить ключ предыдущего месяца.
  * '2026-09' → '2026-08'. '2026-01' → '2025-12'.
+ *
+ * ЭКСПОРТИРУЕТСЯ для использования в BudgetScreen (фильтр «Прошлый месяц»).
  */
-function previousMonthKey(monthKey: string): string {
+export function previousMonthKey(monthKey: string): string {
   const [y, m] = monthKey.split('-').map(Number);
   const prev = new Date(Date.UTC(y, m - 2, 1));
   const year = prev.getUTCFullYear();
@@ -120,7 +122,7 @@ export function computePulse(
     ),
 
     expenseCurrent,
-    expensePrevious: expensePrev,   // ← ИСПРАВЛЕНО
+    expensePrevious: expensePrev,
     expenseDeltaPercent: deltaPercent(
       expenseCurrent.minorUnits,
       expensePrev.minorUnits,
@@ -130,7 +132,7 @@ export function computePulse(
     avgCheckPrevious,
 
     incomeCurrent,
-    incomePrevious: incomePrev,     // ← ИСПРАВЛЕНО
+    incomePrevious: incomePrev,
 
     txCountCurrent: txCurrent.length,
     txCountPrevious: txPrev.length,

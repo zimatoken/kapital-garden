@@ -2207,3 +2207,293 @@ body {
   border-color: var(--success);
   border-style: solid;
 }
+
+/* ────────────────────────────────────────────
+   Monthly Report
+   ──────────────────────────────────────────── */
+
+.monthly-report {
+  border-color: rgba(234, 179, 8, 0.35);
+  background: rgba(234, 179, 8, 0.05);
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.report-header h2 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--heading);
+}
+
+.report-close {
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.report-close:hover {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text);
+}
+
+.report-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.report-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.report-label {
+  color: var(--subtext);
+}
+
+.report-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.report-income  { color: #4ade80; }
+.report-expense { color: #f87171; }
+.report-deposit { color: #facc15; }
+
+.report-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.report-fact {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.fact-label {
+  color: var(--subtext);
+}
+
+.fact-value {
+  color: var(--heading);
+  font-weight: 600;
+  text-align: right;
+}
+
+.report-compare {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.report-compare-title {
+  font-size: 12px;
+  color: var(--subtext);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.report-compare-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 13px;
+  padding: 3px 0;
+}
+
+.report-compare-label {
+  color: var(--text);
+}
+
+.report-delta {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--subtext);
+  font-variant-numeric: tabular-nums;
+  padding: 2px 8px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 6px;
+}
+
+.modal-header-report {
+  background: linear-gradient(90deg, #eab308 0%, #ca8a04 100%);
+}
+
+.modal-header-report h2 {
+  color: white;
+}
+
+/* ────────────────────────────────────────────
+   Goals Summary
+   ──────────────────────────────────────────── */
+
+.goals-summary {
+  margin-bottom: 12px;
+}
+
+.goals-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.goals-summary-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.goals-summary-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--heading);
+}
+
+.goals-summary-sub {
+  font-size: 12px;
+  color: var(--subtext);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.goals-summary-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.goals-summary-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* ────────────────────────────────────────────
+   Transaction Filters
+   ──────────────────────────────────────────── */
+
+.tx-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tx-search {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.tx-search:focus {
+  outline: none;
+  border-color: var(--success);
+}
+
+.tx-search::placeholder {
+  color: var(--subtext);
+}
+
+.tx-filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tx-filter-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.tx-filter-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.tx-chip {
+  padding: 6px 12px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.tx-chip:hover {
+  border-color: var(--success);
+}
+
+.tx-chip-active {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+  font-weight: 600;
+}
+
+.tx-filter-reset {
+  align-self: flex-start;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  color: var(--subtext);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.tx-filter-reset:hover {
+  color: var(--text);
+}
+
+.tx-count {
+  font-size: 12px;
+  text-align: center;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+}

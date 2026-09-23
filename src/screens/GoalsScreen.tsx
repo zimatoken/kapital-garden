@@ -15,8 +15,7 @@ import { todayISODate } from '../core/dates';
  * - Список активных целей с прогрессом
  * - Кнопка «+ Новая цель»
  * - Архив достигнутых
- *
- * При клике на карточку — раскрытие деталей (позже).
+ * - Сводку по всем целям (общая сумма, средний прогресс)
  */
 export function GoalsScreen() {
   const state = useStoreState();
@@ -40,6 +39,31 @@ export function GoalsScreen() {
   // Архивные
   const archived = allProgress.filter((p) => p.goal.archived);
 
+  // Сводка по активным целям
+  const summary = useMemo(() => {
+    if (active.length === 0) return null;
+
+    const totalSavedMinor = active.reduce(
+      (sum, p) => sum + p.saved.minorUnits,
+      0,
+    );
+    const totalTargetMinor = active.reduce(
+      (sum, p) => sum + p.target.minorUnits,
+      0,
+    );
+    const avgPercent =
+      totalTargetMinor > 0
+        ? (totalSavedMinor / totalTargetMinor) * 100
+        : 0;
+
+    return {
+      count: active.length,
+      totalSavedMinor,
+      totalTargetMinor,
+      avgPercent,
+    };
+  }, [active]);
+
   const hasAny = allProgress.length > 0;
 
   return (
@@ -53,6 +77,34 @@ export function GoalsScreen() {
       </header>
 
       <main className="goals-main">
+        {/* Сводка по активным */}
+        {summary && (
+          <section className="card goals-summary">
+            <div className="goals-summary-header">
+              <span className="goals-summary-icon">🌱</span>
+              <div>
+                <div className="goals-summary-title">
+                  {summary.count}{' '}
+                  {summary.count === 1
+                    ? 'цель растёт'
+                    : summary.count < 5
+                    ? 'цели растут'
+                    : 'целей растёт'}
+                </div>
+                <div className="goals-summary-sub">
+                  Общий прогресс: {summary.avgPercent.toFixed(1)}%
+                </div>
+              </div>
+            </div>
+            <div className="goals-summary-bar">
+              <div
+                className="goals-summary-bar-fill"
+                style={{ width: `${Math.min(100, summary.avgPercent)}%` }}
+              />
+            </div>
+          </section>
+        )}
+
         {/* Пусто */}
         {!hasAny && (
           <section className="card welcome">
@@ -119,7 +171,7 @@ export function GoalsScreen() {
           </section>
         )}
 
-        {/* Кнопка «+» если есть цели */}
+        {/* Кнопка «+» если есть цели, но нет активных */}
         {hasAny && active.length === 0 && (
           <button
             className="btn-primary"
@@ -131,7 +183,7 @@ export function GoalsScreen() {
         )}
       </main>
 
-      {/* Модалка */}
+      {/* Модалка создания цели */}
       <GoalEditor
         open={editorOpen}
         onClose={() => setEditorOpen(false)}

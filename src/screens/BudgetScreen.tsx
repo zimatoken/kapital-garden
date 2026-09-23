@@ -10,6 +10,12 @@ import { computePatterns } from '../core/patterns';
 import { PatternsCard } from '../components/PatternsCard';
 import { guessCategory } from '../core/categoryRules';
 import { openGoldenInvestor } from '../core/investment';
+import { previousMonthKey } from '../core/pulse';
+import {
+  TransactionFilters,
+  applyFilters,
+  type TxFilters,
+} from '../components/TransactionFilters';
 import type { Transaction, TxType } from '../types/transaction';
 import type { Goal } from '../types/goal';
 
@@ -67,6 +73,27 @@ export function BudgetScreen() {
     const [year, month] = monthKey.split('-');
     return `${MONTHS[parseInt(month, 10) - 1]} ${year}`;
   }, [monthKey]);
+
+  // ─── Фильтры транзакций ───
+  const [txFilters, setTxFilters] = useState<TxFilters>({
+    type: 'all',
+    categoryId: 'all',
+    month: 'current',
+    query: '',
+  });
+
+  const prevMonthKey = useMemo(() => previousMonthKey(monthKey), [monthKey]);
+
+  const filteredTransactions = useMemo(
+    () =>
+      applyFilters(
+        state.transactions,
+        txFilters,
+        monthKey,
+        prevMonthKey,
+      ),
+    [state.transactions, txFilters, monthKey, prevMonthKey],
+  );
 
   return (
     <div className="budget-screen">
@@ -135,11 +162,23 @@ export function BudgetScreen() {
 
         <section className="card">
           <h2>{STRINGS.budgetTransactions}</h2>
-          {monthTransactions.length === 0 ? (
-            <p className="muted">{STRINGS.budgetNoTransactions}</p>
+
+          <TransactionFilters
+            filters={txFilters}
+            onChange={setTxFilters}
+            categories={state.categories}
+            monthLabel={monthLabel}
+          />
+
+          {filteredTransactions.length === 0 ? (
+            <p className="muted">
+              {monthTransactions.length === 0
+                ? STRINGS.budgetNoTransactions
+                : 'Ничего не найдено. Попробуй изменить фильтры.'}
+            </p>
           ) : (
             <div className="tx-list">
-              {monthTransactions
+              {filteredTransactions
                 .slice()
                 .reverse()
                 .map((t) => (
@@ -150,6 +189,12 @@ export function BudgetScreen() {
                   />
                 ))}
             </div>
+          )}
+
+          {filteredTransactions.length > 0 && (
+            <p className="tx-count muted">
+              Показано: {filteredTransactions.length} из {state.transactions.length}
+            </p>
           )}
         </section>
 
