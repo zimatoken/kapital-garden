@@ -403,71 +403,132 @@ body {
 }
 
 /* ────────────────────────────────────────────
-   Garden Year
+   Garden Year — адаптив + скролл
    ──────────────────────────────────────────── */
+
+.garden-year {
+  width: 100%;
+}
 
 .garden-year-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 1rem;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.garden-year-header h2 {
+  font-size: 15px;
+  color: var(--heading);
+  margin: 0;
 }
 
 .garden-year-hint {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--subtext);
+}
+
+/* Обёртка со скроллом */
+.garden-year-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0 -4px;
+  padding: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.garden-year-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .garden-row {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(12, minmax(36px, 1fr));
+  gap: 6px;
+  min-width: min-content;
 }
 
+/* Ячейка месяца */
 .garden-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
-  padding: 6px 2px;
+  padding: 8px 4px;
   background: var(--card-bg-soft);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
   cursor: pointer;
-  transition: transform 0.15s, background 0.15s;
+  transition: all 0.15s;
+  min-width: 36px;
 }
 
 .garden-cell:hover {
-  transform: translateY(-2px);
-  background: var(--card-bg);
-}
-
-.garden-cell-missed {
-  opacity: 0.4;
+  border-color: var(--success);
+  transform: translateY(-1px);
 }
 
 .garden-cell-selected {
-  border-color: var(--primary);
-  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--success);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
 }
 
 .garden-cell-emoji {
   font-size: 18px;
+  line-height: 1;
 }
 
 .garden-cell-label {
   font-size: 10px;
   color: var(--subtext);
+  line-height: 1;
 }
 
+/* Статусы */
+.garden-cell-full {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.garden-cell-partial {
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.garden-cell-little {
+  background: rgba(234, 179, 8, 0.08);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.garden-cell-missed {
+  background: transparent;
+  opacity: 0.5;
+}
+
+/* Детали выбранного месяца */
 .garden-details {
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
+  margin-top: 12px;
+  padding: 10px 12px;
   background: var(--card-bg-soft);
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.garden-details strong {
+  color: var(--heading);
+}
+
+.garden-details span {
+  color: var(--subtext);
 }
 
 /* ────────────────────────────────────────────
@@ -713,50 +774,63 @@ body {
   padding-bottom: 80px;
 }
 
+/* ────────────────────────────────────────────
+   TabBar — компактный под 6 кнопок
+   ──────────────────────────────────────────── */
+
 .tab-bar {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 0 !important;
+  padding: 6px 4px !important;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 64px;
-  background: var(--card-bg);
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
   z-index: 100;
-  backdrop-filter: blur(12px);
-  background: rgba(30, 41, 59, 0.95);
-}
-
-[data-theme="light"] .tab-bar {
-  background: rgba(255, 255, 255, 0.95);
+  /* Отступ под системный свайп-бар Android/iPhone */
+  padding-bottom: max(6px, env(safe-area-inset-bottom)) !important;
 }
 
 .tab-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 0.5rem 1.5rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--subtext);
-  transition: color 0.15s;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  padding: 4px 0 !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--subtext) !important;
+  font-family: inherit !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: color 0.15s !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 
 .tab-item-active {
-  color: var(--success);
+  color: var(--success) !important;
 }
 
 .tab-icon {
-  font-size: 22px;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  display: block !important;
 }
 
 .tab-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px !important;
+  line-height: 1.1 !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
 }
 
 /* ────────────────────────────────────────────
@@ -2776,4 +2850,27 @@ body {
 
 [data-theme='light'] .goal-scenario-plan strong {
   color: #78350f;
+}
+
+/* ────────────────────────────────────────────
+   GardenYear — горизонтальный скролл
+   ──────────────────────────────────────────── */
+
+.garden-year-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0 -4px;
+  padding: 0 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.garden-year-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.garden-year-months {
+  display: flex;
+  gap: 6px;
+  min-width: min-content;
 }

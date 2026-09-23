@@ -63,7 +63,7 @@ export function PatternsCard({ patterns, monthLabel }: PatternsCardProps) {
           {/* Топ день недели */}
           {topWeekday !== null && topWeekdayAmount !== null && (
             <div className="pattern-row">
-              <span className="pattern-label">📅 Чаще тратишь в</span>
+              <span className="pattern-label">📅 Чаще тратишь:</span>
               <span className="pattern-value">{weekdayName(topWeekday)}</span>
             </div>
           )}

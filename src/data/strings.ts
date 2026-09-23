@@ -51,7 +51,7 @@ export const STRINGS = {
   gardenYearDays: (active: number, total: number) => `${active} из ${total} дней с отложениями`,
 
   // ─── Бюджет ────────────────────────────────
-  budgetTitle: '💰 Бюджет',
+  budgetTitle: 'Бюджет',
   budgetIncome: 'Доход',
   budgetExpense: 'Расход',
   budgetDeposited: 'Отложено (10%)',

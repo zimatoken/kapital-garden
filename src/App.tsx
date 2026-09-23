@@ -140,7 +140,7 @@ export default function App() {
           onClick={() => go('analytics')}
         >
           <span className="tab-icon">📊</span>
-          <span className="tab-label">Аналитика</span>
+          <span className="tab-label">Анализ</span>
         </button>
         <button
           className={`tab-item ${tab === 'achievements' ? 'tab-item-active' : ''}`}
