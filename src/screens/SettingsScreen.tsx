@@ -5,6 +5,8 @@ import { useStore, useStoreState } from '../hooks/useStore';
 import { RecurringEditor } from '../components/RecurringEditor';
 import { formatMoney } from '../core/money';
 import { exportFullCSV } from '../core/csv';
+import { HelpButton } from '../components/HelpButton';
+import { HelpModal } from '../components/HelpModal';
 import type { AppSettings } from '../types/settings';
 
 export function SettingsScreen() {
@@ -12,6 +14,7 @@ export function SettingsScreen() {
   const store = useStore();
   const [confirmReset, setConfirmReset] = useState(false);
   const [recurringOpen, setRecurringOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const savings = state.settings.savings;
 
@@ -208,15 +211,23 @@ export function SettingsScreen() {
           <h2>🌳 О Kapital Garden</h2>
           <p className="muted" style={{ fontSize: 13, lineHeight: 1.6 }}>
             Каждая отложенная копейка — семя твоего будущего.<br />
-            Версия 1.1 · PHASE 7<br />
+            Версия 1.5 · PHASE 11<br />
             Данные только у тебя. Никакой регистрации.
           </p>
         </section>
       </main>
 
+      {/* Модалка регулярных расходов */}
       <RecurringEditor
         open={recurringOpen}
         onClose={() => setRecurringOpen(false)}
+      />
+
+      {/* Модалка инструкции */}
+      <HelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        initialSectionId="settings"
       />
     </div>
   );

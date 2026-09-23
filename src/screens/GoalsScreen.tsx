@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import { useStoreState } from '../hooks/useStore';
 import { GoalCard } from '../components/GoalCard';
 import { GoalEditor } from '../components/GoalEditor';
+import { HelpButton } from '../components/HelpButton';
+import { HelpModal } from '../components/HelpModal';
 import { computeAllGoals } from '../core/goals';
 import { STRINGS } from '../data/strings';
 import { todayISODate } from '../core/dates';
@@ -16,11 +18,13 @@ import { todayISODate } from '../core/dates';
  * - Кнопка «+ Новая цель»
  * - Архив достигнутых
  * - Сводку по всем целям (общая сумма, средний прогресс)
+ * - Кнопку «?» — инструкция
  */
 export function GoalsScreen() {
   const state = useStoreState();
   const [editorOpen, setEditorOpen] = useState(false);
   const [archivedOpen, setArchivedOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const today = todayISODate();
 
@@ -74,6 +78,7 @@ export function GoalsScreen() {
           <h1>Мои цели</h1>
           <p className="tagline">Куда растёт твой сад</p>
         </div>
+        <HelpButton onClick={() => setHelpOpen(true)} />
       </header>
 
       <main className="goals-main">
@@ -187,6 +192,13 @@ export function GoalsScreen() {
       <GoalEditor
         open={editorOpen}
         onClose={() => setEditorOpen(false)}
+      />
+
+      {/* Модалка инструкции */}
+      <HelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        initialSectionId="goals"
       />
     </div>
   );

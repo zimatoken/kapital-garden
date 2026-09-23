@@ -11,6 +11,8 @@ import { PatternsCard } from '../components/PatternsCard';
 import { guessCategory } from '../core/categoryRules';
 import { openGoldenInvestor } from '../core/investment';
 import { previousMonthKey } from '../core/pulse';
+import { HelpButton } from '../components/HelpButton';
+import { HelpModal } from '../components/HelpModal';
 import {
   TransactionFilters,
   applyFilters,
@@ -23,6 +25,7 @@ export function BudgetScreen() {
   const state = useStoreState();
   const store = useStore();
   const [addType, setAddType] = useState<TxType | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const today = todayISODate();
   const monthKey = today.slice(0, 7);
@@ -103,6 +106,7 @@ export function BudgetScreen() {
           <h1>{STRINGS.budgetTitle}</h1>
           <p className="tagline">{formatMonth(monthKey)}</p>
         </div>
+        <HelpButton onClick={() => setHelpOpen(true)} />
       </header>
 
       <main className="budget-main">
@@ -203,6 +207,7 @@ export function BudgetScreen() {
         )}
       </main>
 
+      {/* Модалка ввода транзакции */}
       {addType && (
         <AddTransactionModal
           type={addType}
@@ -211,6 +216,13 @@ export function BudgetScreen() {
           onClose={() => setAddType(null)}
         />
       )}
+
+      {/* Модалка инструкции */}
+      <HelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        initialSectionId="budget"
+      />
     </div>
   );
 }

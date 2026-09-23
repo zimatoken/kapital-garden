@@ -258,6 +258,28 @@ export class Store {
     this.notify();
   }
 
+    /* ─── Импорт / экспорт ─────────────────── */
+
+  /**
+   * Полностью заменить состояние (импорт JSON).
+   * Используется в SettingsScreen → «Импорт JSON».
+   */
+  async replaceState(next: KGState): Promise<void> {
+    // Страховка от несовпадения схемы
+    const safe: KGState = {
+      ...next,
+      recurring: Array.isArray(next.recurring) ? next.recurring : [],
+      transactions: Array.isArray(next.transactions) ? next.transactions : [],
+      deposits: Array.isArray(next.deposits) ? next.deposits : [],
+      goals: Array.isArray(next.goals) ? next.goals : [],
+      categories: Array.isArray(next.categories) ? next.categories : [],
+    };
+
+    this.state = safe;
+    await this.adapter.save(this.state);
+    this.notify();
+  }
+
   /* ─── Настройки ───────────────────────────── */
 
   async updateSettings(patch: Partial<KGState['settings']>): Promise<void> {

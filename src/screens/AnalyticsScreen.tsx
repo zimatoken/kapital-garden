@@ -7,6 +7,8 @@ import { todayISODate } from '../core/dates';
 import { formatMoney } from '../core/money';
 import { MonthChart } from '../components/MonthChart';
 import { CategoryPie } from '../components/CategoryPie';
+import { HelpButton } from '../components/HelpButton';
+import { HelpModal } from '../components/HelpModal';
 
 const PERIOD_OPTIONS = [
   { months: 3, label: '3 мес' },
@@ -17,6 +19,7 @@ const PERIOD_OPTIONS = [
 export function AnalyticsScreen() {
   const state = useStoreState();
   const [monthsBack, setMonthsBack] = useState(6);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const todayKey = todayISODate().slice(0, 7);
 
@@ -41,11 +44,12 @@ export function AnalyticsScreen() {
   return (
     <div className="analytics-screen">
       <header className="header">
-        <span className="logo">📊</span>
+        <span className="logo">⚙️</span>
         <div>
-          <h1>Аналитика</h1>
-          <p className="tagline">Куда уходят деньги и как растёт сад</p>
+          <h1>Настройки</h1>
+          <p className="tagline">Твой сад, твои правила</p>
         </div>
+        <HelpButton onClick={() => setHelpOpen(true)} />
       </header>
 
       <main className="analytics-main">
@@ -61,7 +65,6 @@ export function AnalyticsScreen() {
           ))}
         </div>
 
-        {/* ─── Карточка «факты о саде» ─── */}
         {analytics.totalIncome.minorUnits > 0 && (
           <section className="card analytics-facts">
             <div className="fact-row">
@@ -100,7 +103,6 @@ export function AnalyticsScreen() {
           </section>
         )}
 
-        {/* ─── Итого за период ─── */}
         <section className="card">
           <h2>📈 Итого за {monthsBack} мес</h2>
           <div className="analytics-summary">
@@ -125,13 +127,11 @@ export function AnalyticsScreen() {
           </div>
         </section>
 
-        {/* ─── График по месяцам ─── */}
         <section className="card">
           <h2>📅 По месяцам</h2>
           <MonthChart months={analytics.months} />
         </section>
 
-        {/* ─── Круговая диаграмма ─── */}
         <section className="card">
           <h2>🍩 Куда уходят деньги</h2>
           <p className="muted" style={{ marginBottom: 12, fontSize: 12 }}>
@@ -149,6 +149,12 @@ export function AnalyticsScreen() {
           </section>
         )}
       </main>
+
+      <HelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        initialSectionId="analytics"
+      />
     </div>
   );
 }

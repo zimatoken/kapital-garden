@@ -2874,3 +2874,27 @@ body {
   gap: 6px;
   min-width: min-content;
 }
+
+/* ────────────────────────────────────────────
+   Help — кнопка и модалка
+   ──────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header > div:first-of-type {
+  flex: 1;
+  min-width: 0;
+}
+
+.help-backdrop {
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -10,6 +10,8 @@ import { GardenYear } from '../components/GardenYear';
 import { GrowthNumbers } from '../components/GrowthNumbers';
 import { PulseCard } from '../components/PulseCard';
 import { RecurringPrompt } from '../components/RecurringPrompt';
+import { HelpButton } from '../components/HelpButton';
+import { HelpModal } from '../components/HelpModal';
 import { computeStreak } from '../core/streak';
 import { computeOctave } from '../core/octaves';
 import { computeGardenYear } from '../core/garden';
@@ -23,6 +25,7 @@ export function GardenScreen() {
   const state = useStoreState();
   const [depositOpen, setDepositOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const today = todayISODate();
   const year = Number(today.slice(0, 4));
@@ -33,13 +36,11 @@ export function GardenScreen() {
   const garden = useMemo(() => computeGardenYear(state.deposits, year), [state.deposits, year]);
   const total = useMemo(() => sumMoney(state.deposits.map((d) => d.amount)), [state.deposits]);
 
-  // Пульс — сравнение с собой
   const pulse = useMemo(
     () => computePulse(state.transactions, state.deposits, monthKey),
     [state.transactions, state.deposits, monthKey],
   );
 
-  // Средний дневной темп
   const dailyAvgMinor = useMemo(() => {
     if (state.deposits.length === 0) return 0;
     const first = state.deposits.map((d) => d.date).sort()[0];
@@ -70,28 +71,23 @@ export function GardenScreen() {
           <h1>{STRINGS.appTitle}</h1>
           <p className="tagline">{STRINGS.tagline}</p>
         </div>
+        <HelpButton onClick={() => setHelpOpen(true)} />
       </header>
 
       <main className="garden-main">
-        {/* Дерево */}
         <section className="card card-tree">
           <TreeVisual octave={octave} progress={octaveProgress} />
         </section>
 
-        {/* Пульс — сравнение с собой */}
         {!isEmpty && <PulseCard pulse={pulse} />}
-
-        {/* Промпт регулярных расходов */}
         {!isEmpty && <RecurringPrompt />}
 
-        {/* Стрик */}
         {!isEmpty && (
           <section className="card card-streak">
             <StreakRing streak={streak} />
           </section>
         )}
 
-        {/* Числа роста */}
         {!isEmpty && (
           <GrowthNumbers
             dailyAvgMinor={dailyAvgMinor}
@@ -99,12 +95,10 @@ export function GardenScreen() {
           />
         )}
 
-        {/* Сад года */}
         <section className="card">
           <GardenYear months={garden} year={year} />
         </section>
 
-        {/* Прогноз */}
         {!isEmpty && dailyAvgMinor > 0 && (
           <section className="card">
             <h2>{STRINGS.forecastTitle}</h2>
@@ -127,7 +121,6 @@ export function GardenScreen() {
           </section>
         )}
 
-        {/* Пустой сад */}
         {isEmpty && (
           <section className="card welcome">
             <h2>{STRINGS.gardenEmptyTitle}</h2>
@@ -136,7 +129,6 @@ export function GardenScreen() {
         )}
       </main>
 
-      {/* Плавающие кнопки */}
       <div className="fab-group">
         <button
           className="fab fab-expense"
@@ -162,6 +154,12 @@ export function GardenScreen() {
       <QuickExpense
         open={expenseOpen}
         onClose={() => setExpenseOpen(false)}
+      />
+
+      <HelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        initialSectionId="garden"
       />
     </div>
   );

@@ -1,14 +1,17 @@
 // src/screens/AchievementsScreen.tsx
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useStoreState } from '../hooks/useStore';
 import { computeAchievements, countUnlocked } from '../core/achievements';
 import { computeStreak } from '../core/streak';
 import { todayISODate } from '../core/dates';
+import { HelpButton } from '../components/HelpButton';
+import { HelpModal } from '../components/HelpModal';
 import { AchievementCard } from '../components/AchievementCard';
 
 export function AchievementsScreen() {
   const state = useStoreState();
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const achievements = useMemo(() => {
     const today = todayISODate();
@@ -29,6 +32,7 @@ export function AchievementsScreen() {
             {unlocked} из {total} открыто
           </p>
         </div>
+        <HelpButton onClick={() => setHelpOpen(true)} />
       </header>
 
       <main className="achievements-main">
@@ -40,6 +44,11 @@ export function AchievementsScreen() {
           </div>
         </section>
       </main>
+      <HelpModal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        initialSectionId="achievements"
+      />
     </div>
   );
 }
