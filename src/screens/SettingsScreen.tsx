@@ -197,8 +197,8 @@ export function SettingsScreen() {
           </button>
           {confirmReset && (
             <button
-              className="btn-secondary"
-              style={{ marginTop: 8 }}
+              className="btn-cancel"
+              style={{ marginTop: 8, width: '100%' }}
               onClick={() => setConfirmReset(false)}
             >
               Отмена
