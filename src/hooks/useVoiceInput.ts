@@ -2,13 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-/**
- * Web Speech API — хук для голосового ввода.
- *
- * Работает в Chrome (Android/Desktop) и Safari (iOS 14.5+).
- * Если не поддерживается — возвращает `supported: false`.
- */
-
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -26,8 +19,8 @@ interface SpeechRecognition extends EventTarget {
   start(): void;
   stop(): void;
   abort(): void;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onresult: ((e: SpeechRecognitionEvent) => void) | null;
+  onerror: ((e: SpeechRecognitionErrorEvent) => void) | null;
   onend: (() => void) | null;
 }
 
@@ -40,8 +33,23 @@ interface UseVoiceInputOptions {
   onResult?: (transcript: string) => void;
 }
 
+/**
+ * Web Speech API — хук для голосового ввода.
+ *
+ * Работает в Chrome (Android/Desktop) и Safari (iOS 14.5+).
+ * Если не поддерживается — возвращает `supported: false`.
+ *
+ * ВАЖНО: onResult хранится в ref — чтобы recognition
+ * не пересоздавался на каждый рендер (иначе abort-цикл).
+ */
 export function useVoiceInput(options: UseVoiceInputOptions = {}) {
   const { lang = 'ru-RU', onResult } = options;
+
+  // 🔑 Стабильная ссылка на колбэк — не ломает эффект
+  const onResultRef = useRef(onResult);
+  useEffect(() => {
+    onResultRef.current = onResult;
+  }, [onResult]);
 
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
@@ -71,20 +79,25 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}) {
     recognition.maxAlternatives = 1;
 
     recognition.onresult = (event) => {
-      const text = event.results[0]?.[0]?.transcript ?? '';
+      // 🔑 Используем resultIndex — правильный результат
+      const res = event.results[event.resultIndex];
+      const text = res?.[0]?.transcript ?? '';
+      console.log('[voice] result:', text);
       setTranscript(text);
-      onResult?.(text);
+      onResultRef.current?.(text);
     };
 
     recognition.onerror = (event) => {
+      console.error('[voice] error:', event.error);
       const map: Record<string, string> = {
-        'no-speech': 'Ничего не услышал. Попробуй снова.',
+        'no-speech': 'Ничего не услышал. Говори чётче.',
         'audio-capture': 'Микрофон недоступен.',
-        'not-allowed': 'Разреши доступ к микрофону в настройках браузера.',
-        'network': 'Нет соединения для распознавания.',
+        'not-allowed': 'Разреши доступ к микрофону в настройках Chrome.',
+        'network': 'Нет связи с сервером распознавания. Проверь интернет и открой именно Chrome.',
+        'language-not-supported': 'Русский язык не поддерживается. Обнови Chrome.',
         'aborted': '',
       };
-      const message = map[event.error] ?? 'Ошибка распознавания.';
+      const message = map[event.error] ?? `Ошибка: ${event.error}`;
       if (message) setError(message);
       setListening(false);
     };
@@ -99,7 +112,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}) {
       recognition.abort();
       recognitionRef.current = null;
     };
-  }, [lang, onResult]);
+  }, [lang]); // 🔑 ТОЛЬКО lang — recognition живёт всё время жизни хука
 
   const start = () => {
     if (!recognitionRef.current) return;
@@ -110,13 +123,12 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}) {
       setListening(true);
     } catch (e) {
       // Уже запущено — игнорируем
-      console.warn('[voice]', e);
+      console.warn('[voice] start:', e);
     }
   };
 
   const stop = () => {
-    if (!recognitionRef.current) return;
-    recognitionRef.current.stop();
+    recognitionRef.current?.stop();
     setListening(false);
   };
 
