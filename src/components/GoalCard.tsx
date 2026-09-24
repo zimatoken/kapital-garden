@@ -1,10 +1,12 @@
 // src/components/GoalCard.tsx
 
+import { useState } from 'react';
 import type { GoalProgress } from '../core/goals';
 import { STAGE_EMOJI, STAGE_LABEL, formatEta } from '../core/goals';
 import { formatMoney } from '../core/money';
 import { todayISODate } from '../core/dates';
 import { GoalScenario } from './GoalScenario';
+import { GoalActions } from './GoalActions';
 
 interface GoalCardProps {
   progress: GoalProgress;
@@ -19,13 +21,15 @@ interface GoalCardProps {
  * - Название
  * - Прогресс (дерево + бар + %)
  * - Остаток
- * - ETA (если данных достаточно)
+ * - ETA
  * - Сценарии «что если ускорить»
+ * - Кнопку ⋯ — меню действий
  */
 export function GoalCard({ progress, onClick }: GoalCardProps) {
   const { goal, saved, target, percent, remaining, etaDays, stage, hasEnoughData } = progress;
   const etaText = formatEta(etaDays);
   const today = todayISODate();
+  const [actionsOpen, setActionsOpen] = useState(false);
 
   return (
     <div
@@ -39,6 +43,17 @@ export function GoalCard({ progress, onClick }: GoalCardProps) {
         <span className="goal-card-icon">{goal.icon}</span>
         <h3 className="goal-card-title">{goal.title}</h3>
         {goal.archived && <span className="goal-card-archive-badge">в архиве</span>}
+        <button
+          className="goal-card-menu"
+          onClick={(e) => {
+            e.stopPropagation();
+            setActionsOpen(true);
+          }}
+          aria-label="Меню цели"
+          title="Меню"
+        >
+          ⋯
+        </button>
       </div>
 
       {/* Дерево стадий */}
@@ -85,9 +100,17 @@ export function GoalCard({ progress, onClick }: GoalCardProps) {
         )}
       </div>
 
-      {/* Сценарии — только для активных целей с данными */}
+      {/* Сценарии */}
       {!goal.archived && stage !== 'achieved' && (
         <GoalScenario progress={progress} today={today} />
+      )}
+
+      {/* Модалка действий */}
+      {actionsOpen && (
+        <GoalActions
+          progress={progress}
+          onClose={() => setActionsOpen(false)}
+        />
       )}
     </div>
   );

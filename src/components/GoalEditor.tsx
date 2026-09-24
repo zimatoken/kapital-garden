@@ -1,6 +1,6 @@
 // src/components/GoalEditor.tsx
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Goal, GoalKind, GoalIcon } from '../types/goal';
 import { useStore } from '../hooks/useStore';
 
@@ -8,16 +8,26 @@ interface GoalEditorProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: (goal: Goal) => void;
+  /** Если передан — режим редактирования. */
+  initialGoal?: Goal | null;
 }
 
 /**
- * Модалка создания новой цели.
+ * Модалка создания или редактирования цели.
  *
- * 5 типов целей + своя:
- * 🏡 Квартира · 🚗 Машина · 🌴 Пенсия · 🎓 Образование · 💎 Своё
+ * Режимы:
+ * - Создание: `initialGoal` не передан.
+ * - Редактирование: `initialGoal` — существующая цель.
  */
-export function GoalEditor({ open, onClose, onSuccess }: GoalEditorProps) {
+export function GoalEditor({
+  open,
+  onClose,
+  onSuccess,
+  initialGoal = null,
+}: GoalEditorProps) {
   const store = useStore();
+  const isEditing = initialGoal !== null;
+
   const [kind, setKind] = useState<GoalKind>('apartment');
   const [icon, setIcon] = useState<GoalIcon>('🏡');
   const [title, setTitle] = useState('Квартира');
@@ -25,6 +35,26 @@ export function GoalEditor({ open, onClose, onSuccess }: GoalEditorProps) {
   const [targetDate, setTargetDate] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Сброс / подстановка при открытии
+  useEffect(() => {
+    if (!open) return;
+
+    if (initialGoal) {
+      setKind(initialGoal.kind);
+      setIcon(initialGoal.icon);
+      setTitle(initialGoal.title);
+      setAmountStr(String(initialGoal.targetAmount.minorUnits / 100));
+      setTargetDate(initialGoal.targetDate ?? '');
+    } else {
+      setKind('apartment');
+      setIcon('🏡');
+      setTitle('Квартира');
+      setAmountStr('5000000');
+      setTargetDate('');
+    }
+    setError(null);
+  }, [open, initialGoal]);
 
   if (!open) return null;
 
@@ -36,20 +66,25 @@ export function GoalEditor({ open, onClose, onSuccess }: GoalEditorProps) {
     setSaving(true);
     setError(null);
     try {
-      const goal = await store.addGoal({
-        kind,
-        icon,
-        title: title.trim(),
-        targetMinor: amountMinor,
-        targetDate: targetDate || null,
-      });
-      onSuccess?.(goal);
-      // Сброс
-      setKind('apartment');
-      setIcon('🏡');
-      setTitle('Квартира');
-      setAmountStr('5000000');
-      setTargetDate('');
+      if (isEditing && initialGoal) {
+        await store.updateGoal(initialGoal.id, {
+          kind,
+          icon,
+          title: title.trim(),
+          targetAmount: { minorUnits: amountMinor, currency: 'RUB' },
+          targetDate: targetDate || null,
+        });
+        onSuccess?.({ ...initialGoal, title: title.trim() });
+      } else {
+        const goal = await store.addGoal({
+          kind,
+          icon,
+          title: title.trim(),
+          targetMinor: amountMinor,
+          targetDate: targetDate || null,
+        });
+        onSuccess?.(goal);
+      }
       onClose();
     } catch (e) {
       setError((e as Error).message);
@@ -65,14 +100,14 @@ export function GoalEditor({ open, onClose, onSuccess }: GoalEditorProps) {
   const chooseKind = (k: GoalKind, i: GoalIcon, defaultTitle: string) => {
     setKind(k);
     setIcon(i);
-    setTitle(defaultTitle);
+    if (!isEditing) setTitle(defaultTitle);
   };
 
   return (
     <div className="modal-backdrop" onClick={handleBackdrop}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <header className="modal-header">
-          <h2>🌱 Новая цель</h2>
+        <header className={`modal-header ${isEditing ? 'modal-header-goal' : ''}`}>
+          <h2>{isEditing ? '✏️ Изменить цель' : '🌱 Новая цель'}</h2>
           <button className="modal-close" onClick={onClose} aria-label="Закрыть">
             ✕
           </button>
@@ -156,17 +191,18 @@ export function GoalEditor({ open, onClose, onSuccess }: GoalEditorProps) {
             className="note-input"
             value={targetDate}
             onChange={(e) => setTargetDate(e.target.value)}
-            min={new Date().toISOString().slice(0, 10)}
           />
 
-          {error && (
-            <div className="goal-error">⚠️ {error}</div>
-          )}
+          {error && <div className="goal-error">⚠️ {error}</div>}
         </div>
 
         <footer className="modal-footer">
           <button className="btn-primary" onClick={handleSave} disabled={!canSave}>
-            {saving ? 'Сажаю...' : '🌱 Посадить'}
+            {saving
+              ? 'Сохраняю...'
+              : isEditing
+              ? '💾 Сохранить'
+              : '🌱 Посадить'}
           </button>
         </footer>
       </div>

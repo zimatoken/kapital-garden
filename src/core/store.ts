@@ -28,12 +28,10 @@ export class Store {
     this.state = initialState;
   }
 
-  /** Получить текущее состояние (immutable). */
   getState(): KGState {
     return this.state;
   }
 
-  /** Подписка на изменения. Возвращает unsubscribe. */
   subscribe(listener: () => void): () => void {
     this.listeners.add(listener);
     return () => {
@@ -41,7 +39,6 @@ export class Store {
     };
   }
 
-  /** Уведомить всех слушателей. */
   private notify(): void {
     for (const listener of this.listeners) listener();
   }
@@ -196,11 +193,26 @@ export class Store {
     await this.updateGoal(id, { archived: false });
   }
 
+  /**
+   * Удалить цель полностью.
+   *
+   * Отложения с этим goalId НЕ удаляются — они просто
+   * перестают быть привязанными к цели (goalId остаётся,
+   * но computeGoalProgress больше её не найдёт).
+   *
+   * Так пользователь не теряет историю отложений.
+   */
+  async removeGoal(id: string): Promise<void> {
+    this.state = {
+      ...this.state,
+      goals: this.state.goals.filter((g) => g.id !== id),
+    };
+    await this.adapter.save(this.state);
+    this.notify();
+  }
+
   /* ─── Регулярные расходы ─────────────────── */
 
-  /**
-   * Создать регулярный расход.
-   */
   async addRecurring(params: {
     title: string;
     amountMinor: number;
@@ -231,10 +243,6 @@ export class Store {
     return recurring;
   }
 
-  /**
-   * Обновить регулярный (например, отметить как применённый
-   * через markApplied из core/recurring.ts).
-   */
   async updateRecurring(recurring: RecurringExpense): Promise<void> {
     this.state = {
       ...this.state,
@@ -246,9 +254,6 @@ export class Store {
     this.notify();
   }
 
-  /**
-   * Удалить регулярный.
-   */
   async removeRecurring(id: string): Promise<void> {
     this.state = {
       ...this.state,
@@ -258,14 +263,9 @@ export class Store {
     this.notify();
   }
 
-    /* ─── Импорт / экспорт ─────────────────── */
+  /* ─── Импорт / экспорт ─────────────────── */
 
-  /**
-   * Полностью заменить состояние (импорт JSON).
-   * Используется в SettingsScreen → «Импорт JSON».
-   */
   async replaceState(next: KGState): Promise<void> {
-    // Страховка от несовпадения схемы
     const safe: KGState = {
       ...next,
       recurring: Array.isArray(next.recurring) ? next.recurring : [],
@@ -292,10 +292,6 @@ export class Store {
   }
 }
 
-/**
- * Глобальный экземпляр Store.
- * Создаётся в App.tsx после загрузки состояния.
- */
 let _store: Store | null = null;
 
 export function initStore(adapter: StorageAdapter, state: KGState): Store {
