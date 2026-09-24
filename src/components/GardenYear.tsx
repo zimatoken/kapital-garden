@@ -15,11 +15,12 @@ const MONTH_NAMES = [
 ];
 
 /**
- * Сад года — 12 ячеек.
+ * Сад года — 12 ячеек в сетке 6×2.
  *
- * На узких экранах (< 400px) — горизонтальный скролл.
- * На широких — все 12 месяцев влезают.
- * Клик на месяц — раскрывает детали.
+ * Первая строка: янв-июн.
+ * Вторая строка: июл-дек.
+ *
+ * Все 12 месяцев видны сразу на любом экране.
  */
 export function GardenYear({ months, year }: GardenYearProps) {
   const [selected, setSelected] = useState<GardenMonth | null>(null);
@@ -31,29 +32,27 @@ export function GardenYear({ months, year }: GardenYearProps) {
         <span className="garden-year-hint">Клик на месяц — детали</span>
       </div>
 
-      <div className="garden-year-scroll">
-        <div className="garden-row">
-          {months.map((m) => (
-            <button
-              key={m.label}
-              className={`garden-cell garden-cell-${m.status} ${
-                selected?.label === m.label ? 'garden-cell-selected' : ''
-              }`}
-              onClick={() =>
-                setSelected(selected?.label === m.label ? null : m)
-              }
-              title={`${MONTH_NAMES[m.month - 1]}: ${m.daysActive}/${m.daysTotal} дней`}
-              type="button"
-            >
-              <span className="garden-cell-emoji">
-                {STATUS_EMOJI[m.status]}
-              </span>
-              <span className="garden-cell-label">
-                {MONTH_NAMES[m.month - 1]}
-              </span>
-            </button>
-          ))}
-        </div>
+      <div className="garden-grid">
+        {months.map((m) => (
+          <button
+            key={m.label}
+            className={`garden-cell garden-cell-${m.status} ${
+              selected?.label === m.label ? 'garden-cell-selected' : ''
+            }`}
+            onClick={() =>
+              setSelected(selected?.label === m.label ? null : m)
+            }
+            title={`${MONTH_NAMES[m.month - 1]}: ${m.daysActive}/${m.daysTotal} дней`}
+            type="button"
+          >
+            <span className="garden-cell-emoji">
+              {STATUS_EMOJI[m.status]}
+            </span>
+            <span className="garden-cell-label">
+              {MONTH_NAMES[m.month - 1]}
+            </span>
+          </button>
+        ))}
       </div>
 
       {selected && (
