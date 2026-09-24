@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useStore, useStoreState } from '../hooks/useStore';
-import { todayISODate } from '../core/dates';
 import { guessCategory } from '../core/categoryRules';
 import { formatMoney } from '../core/money';
+import { VoiceInputButton } from './VoiceInputButton';
 
 interface QuickExpenseProps {
   open: boolean;
@@ -18,7 +18,7 @@ interface QuickExpenseProps {
  * - Открывается с экрана Сада.
  * - Минимум полей: сумма + заметка.
  * - Категория определяется автоматически по заметке.
- * - Можно переопределить категорию вручную.
+ * - Голосовой ввод: скажи «заправка 2000» → всё заполнится.
  */
 export function QuickExpense({ open, onClose }: QuickExpenseProps) {
   const store = useStore();
@@ -72,6 +72,20 @@ export function QuickExpense({ open, onClose }: QuickExpenseProps) {
     }
   };
 
+  /**
+   * Результат голосового ввода.
+   * Заполняем сумму и заметку. Категория подсветится автоматически
+   * через useEffect выше.
+   */
+  const handleVoiceResult = (voiceAmountMinor: number, voiceNote: string) => {
+    if (voiceAmountMinor > 0) {
+      setAmountStr(String(voiceAmountMinor / 100));
+    }
+    if (voiceNote) {
+      setNote(voiceNote);
+    }
+  };
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal modal-quick" onClick={(e) => e.stopPropagation()}>
@@ -98,16 +112,18 @@ export function QuickExpense({ open, onClose }: QuickExpenseProps) {
             <span className="amount-suffix">₽</span>
           </div>
 
-          {/* Заметка */}
-          <input
-            type="text"
-            className="note-input"
-            style={{ marginTop: 12 }}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Например: обед, заправка, аптека..."
-            maxLength={80}
-          />
+          {/* Заметка + голосовой ввод */}
+          <div className="note-input-row">
+            <input
+              type="text"
+              className="note-input"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Например: обед, заправка, аптека..."
+              maxLength={80}
+            />
+            <VoiceInputButton onResult={handleVoiceResult} />
+          </div>
 
           {/* Выбор категории — чипы */}
           <div className="quick-category-chips">
@@ -127,7 +143,9 @@ export function QuickExpense({ open, onClose }: QuickExpenseProps) {
 
         <footer className="modal-footer">
           <button className="btn-primary" onClick={handleSave} disabled={!canSave}>
-            {saving ? 'Сохраняю...' : `Записать ${formatMoney({ minorUnits: amountMinor, currency: 'RUB' })}`}
+            {saving
+              ? 'Сохраняю...'
+              : `Записать ${formatMoney({ minorUnits: amountMinor, currency: 'RUB' })}`}
           </button>
         </footer>
       </div>
