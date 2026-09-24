@@ -44,10 +44,10 @@ export function AnalyticsScreen() {
   return (
     <div className="analytics-screen">
       <header className="header">
-        <span className="logo">⚙️</span>
+        <span className="logo">📊</span>
         <div>
-          <h1>Настройки</h1>
-          <p className="tagline">Твой сад, твои правила</p>
+          <h1>Аналитика</h1>
+          <p className="tagline">Куда уходят деньги и как растёт сад</p>
         </div>
         <HelpButton onClick={() => setHelpOpen(true)} />
       </header>
