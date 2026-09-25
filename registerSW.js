@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/kapital-garden/sw.js', { scope: '/kapital-garden/' })})}
