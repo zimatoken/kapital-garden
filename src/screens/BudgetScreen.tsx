@@ -10,6 +10,7 @@ import { computePatterns } from '../core/patterns';
 import { PatternsCard } from '../components/PatternsCard';
 import { guessCategory } from '../core/categoryRules';
 import { openGoldenInvestor } from '../core/investment';
+import { ZIResultBanner } from '../components/ZIResultBanner';
 import { previousMonthKey } from '../core/pulse';
 import { HelpButton } from '../components/HelpButton';
 import { HelpModal } from '../components/HelpModal';
@@ -100,6 +101,9 @@ export function BudgetScreen() {
 
   return (
     <div className="budget-screen">
+      {/* Баннер «ЗИ принял X ₽» — показывается, если пользователь вернулся из ЗИ */}
+      <ZIResultBanner />
+
       <header className="header">
         <span className="logo">💰</span>
         <div>
