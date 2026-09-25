@@ -1,6 +1,6 @@
 // src/core/store.ts
 
-import type { KGState } from '../types/state';
+import { CURRENT_SCHEMA_VERSION, type KGState } from '../types/state';
 import type { DepositEvent, DepositSource } from '../types/deposit';
 import type { Transaction, TxType } from '../types/transaction';
 import type { Goal, GoalKind, GoalIcon } from '../types/goal';
@@ -267,9 +267,20 @@ export class Store {
     this.notify();
   }
 
-  /* ─── Импорт / экспорт ─────────────────── */
-
+  /**
+   * Полностью заменить состояние (импорт JSON).
+   *
+   * Проверяет schemaVersion — защита от импорта старого/битого файла.
+   * Если версия не совпадает — выбрасывает ошибку, состояние НЕ меняется.
+   */
   async replaceState(next: KGState): Promise<void> {
+    if (next.schemaVersion !== CURRENT_SCHEMA_VERSION) {
+      throw new Error(
+        `Неподдерживаемая версия данных: ${next.schemaVersion}. ` +
+        `Ожидается ${CURRENT_SCHEMA_VERSION}.`,
+      );
+    }
+
     const safe: KGState = {
       ...next,
       recurring: Array.isArray(next.recurring) ? next.recurring : [],

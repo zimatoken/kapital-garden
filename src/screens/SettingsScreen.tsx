@@ -41,12 +41,14 @@ export function SettingsScreen() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
         const parsed = JSON.parse(ev.target?.result as string);
-        store.replaceState(parsed);
+        await store.replaceState(parsed);
+        alert('Данные успешно загружены');
       } catch (err) {
-        alert('Не удалось прочитать файл');
+        const message = (err as Error).message;
+        alert(`Не удалось прочитать файл: ${message}`);
       }
     };
     reader.readAsText(file);
