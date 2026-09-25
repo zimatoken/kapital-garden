@@ -21,16 +21,19 @@ export interface ZITransferPacket {
  * Если позже будет общая шина — заменим на postMessage.
  */
 export function openGoldenInvestor(amountMinor: number): void {
-  const packet: ZITransferPacket = {
-    version: 1,
-    transferredAt: new Date().toISOString(),
-    amount: { minorUnits: amountMinor, currency: 'RUB' },
-    source: 'kapital-garden',
-  };
+  // 1. Формируем URL с параметрами
+  const params = new URLSearchParams({
+    from: 'kg',
+    amount: String(amountMinor), // обязательно строка
+    currency: 'RUB',
+    ts: String(Date.now()), // метка времени
+  });
 
-  // Кладём пакет в localStorage (ЗИ его подхватит при старте)
-  localStorage.setItem('zi.transfer.packet', JSON.stringify(packet));
+  const url = `https://zimatoken.github.io/golden-investor/?${params.toString()}`;
 
-  // Открываем ЗИ (замени на реальный URL, когда будет)
-  window.open('https://zimatoken.github.io/golden-investor/', '_blank');
+  // 2. Открываем ЗИ по этому URL
+  window.open(url, '_blank');
+
+  // 3. (Опционально) Можем записать в свой лог, что передали данные
+  console.log(`[KG → ЗИ] Передано ${amountMinor / 100} ₽. URL: ${url}`);
 }
