@@ -176,7 +176,10 @@ export class Store {
     return goal;
   }
 
-  async updateGoal(id: string, patch: Partial<Goal>): Promise<void> {
+  async updateGoal(
+    id: string,
+    patch: Partial<Omit<Goal, 'id'>>,
+  ): Promise<void> {
     this.state = {
       ...this.state,
       goals: this.state.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)),
@@ -196,16 +199,17 @@ export class Store {
   /**
    * Удалить цель полностью.
    *
-   * Отложения с этим goalId НЕ удаляются — они просто
-   * перестают быть привязанными к цели (goalId остаётся,
-   * но computeGoalProgress больше её не найдёт).
-   *
-   * Так пользователь не теряет историю отложений.
+   * Отложения с этим goalId НЕ удаляются, но goalId обнуляется —
+   * они переходят в «общий сад». Так пользователь не теряет
+   * историю отложений, и в данных не остаётся мёртвых ссылок.
    */
   async removeGoal(id: string): Promise<void> {
     this.state = {
       ...this.state,
       goals: this.state.goals.filter((g) => g.id !== id),
+      deposits: this.state.deposits.map((d) =>
+        d.goalId === id ? { ...d, goalId: null } : d,
+      ),
     };
     await this.adapter.save(this.state);
     this.notify();
